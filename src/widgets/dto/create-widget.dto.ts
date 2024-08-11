@@ -1,15 +1,12 @@
-import { IsNumber, IsString, IsObject } from "class-validator";
+import { IsNumber, IsString, IsObject } from 'class-validator';
 
 export class CreateWidgetDto {
-    @IsString()
-    widget_type: string;
+  @IsString()
+  widget_type: string;
 
-    @IsObject()
-    options: { [key: string]: any };
+  @IsObject()
+  options: { [key: string]: any };
 
-    @IsNumber()
-    order: number;
-
-    @IsNumber()
-    navigation_id: number;
+  @IsNumber()
+  navigation_id: number;
 }

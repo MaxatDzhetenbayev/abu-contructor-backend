@@ -8,5 +8,6 @@ import { Navigation } from './entities/navigation.entity';
   imports: [SequelizeModule.forFeature([Navigation])],
   controllers: [NavigationsController],
   providers: [NavigationsService],
+  exports: [NavigationsService],
 })
 export class NavigationsModule {}

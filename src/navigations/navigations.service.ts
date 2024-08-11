@@ -3,6 +3,7 @@ import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
 import { Navigation } from './entities/navigation.entity';
 import { InjectModel } from '@nestjs/sequelize';
+import { Widget } from 'src/widgets/entities/widget.entity';
 
 @Injectable()
 export class NavigationsService {
@@ -51,7 +52,15 @@ export class NavigationsService {
 
   findOne(id: number) {
     try {
-      const navigation = this.navigationRepository.findByPk(id);
+      const navigation = this.navigationRepository.findOne({
+        where: { id },
+        include: [
+          {
+            model: Widget,
+            as: 'widgets',
+          },
+        ],
+      });
 
       if (!navigation)
         throw new InternalServerErrorException(

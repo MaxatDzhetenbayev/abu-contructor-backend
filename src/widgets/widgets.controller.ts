@@ -1,11 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { WidgetsService } from './widgets.service';
 import { CreateWidgetDto } from './dto/create-widget.dto';
 import { UpdateWidgetDto } from './dto/update-widget.dto';
 
 @Controller('widgets')
 export class WidgetsController {
-  constructor(private readonly widgetsService: WidgetsService) { }
+  constructor(private readonly widgetsService: WidgetsService) {}
 
   @Post()
   create(@Body() createWidgetDto: CreateWidgetDto) {

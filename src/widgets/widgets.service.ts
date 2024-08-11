@@ -3,17 +3,26 @@ import { CreateWidgetDto } from './dto/create-widget.dto';
 import { UpdateWidgetDto } from './dto/update-widget.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from './entities/widget.entity';
+import { NavigationsService } from 'src/navigations/navigations.service';
 
 @Injectable()
 export class WidgetsService {
   constructor(
     @InjectModel(Widget)
     private widgetRepository: typeof Widget,
+    private navigationsService: NavigationsService,
   ) {}
 
   async create(createWidgetDto: CreateWidgetDto) {
     try {
-      const createdWidget = await this.widgetRepository.create(createWidgetDto);
+      const navigation = await this.navigationsService.findOne(
+        createWidgetDto.navigation_id,
+      );
+
+      const createdWidget = await this.widgetRepository.create({
+        ...createWidgetDto,
+        order: navigation.widgets.length + 1,
+      });
 
       if (!createdWidget) {
         throw new InternalServerErrorException('Error creating widget');
