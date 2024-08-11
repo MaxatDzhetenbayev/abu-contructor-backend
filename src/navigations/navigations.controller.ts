@@ -1,11 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  HttpCode,
+  Query,
+} from '@nestjs/common';
 import { NavigationsService } from './navigations.service';
 import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
 
 @Controller('navigations')
 export class NavigationsController {
-  constructor(private readonly navigationsService: NavigationsService) { }
+  constructor(private readonly navigationsService: NavigationsService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
@@ -31,7 +42,10 @@ export class NavigationsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNavigationDto: UpdateNavigationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateNavigationDto: UpdateNavigationDto,
+  ) {
     return this.navigationsService.update(+id, updateNavigationDto);
   }
 

@@ -15,10 +15,10 @@ export class Navigation extends Model {
   slug: string;
 
   @Column
-  order: number;
+  navigation_type: string;
 
   @Column
-  navigation_type: string;
+  order: number;
 
   @Column
   parent_id: number | null;
@@ -44,6 +44,29 @@ export class Navigation extends Model {
     });
 
     return navigations.filter((navigation) => navigation.parent_id === null);
+  }
+
+  static async findOneWithChildren(id: number) {
+    const navigation = await this.findByPk(id, {
+      include: [
+        {
+          model: Navigation,
+          as: 'children',
+          include: [{ model: Navigation, as: 'children' }],
+        },
+      ],
+    });
+
+    return navigation;
+  }
+
+  static async getnavigationOrder(parent_id?: number | undefined) {
+    if (parent_id !== undefined) {
+      const navigation = await this.findOneWithChildren(parent_id);
+      return navigation.children.length + 1;
+    }
+    const navigations = await this.findAllWithChildren();
+    return navigations.length + 1;
   }
 
   static async findOneBySlug(slugs: string[]) {

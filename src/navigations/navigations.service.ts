@@ -13,12 +13,13 @@ export class NavigationsService {
 
   async create(createNavigationDto: CreateNavigationDto) {
     try {
+      const order = await this.navigationRepository.getnavigationOrder(
+        createNavigationDto.parent_id,
+      );
+
       const navigation = await this.navigationRepository.create({
-        title: createNavigationDto.title,
-        slug: createNavigationDto.slug,
-        order: createNavigationDto.order,
-        parent_id: createNavigationDto.parent_id,
-        navigation_type: createNavigationDto.navigation_type,
+        ...createNavigationDto,
+        order,
       });
 
       if (!navigation)
@@ -36,7 +37,6 @@ export class NavigationsService {
   async findAll() {
     try {
       const navigations = await this.navigationRepository.findAllWithChildren();
-      console.log(navigations);
       if (!navigations)
         throw new InternalServerErrorException(
           'Navigations could not be finded',
@@ -50,15 +50,24 @@ export class NavigationsService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} navigation`;
+    try {
+      const navigation = this.navigationRepository.findByPk(id);
+
+      if (!navigation)
+        throw new InternalServerErrorException(
+          'Navigation could not be finded',
+        );
+
+      return navigation;
+    } catch (error) {
+      throw new InternalServerErrorException('Navigation could not be finded');
+    }
   }
 
-  // slug example: 'about-us/structure/maxat_dzhetenbaev'
   async findBySlug(slug: string) {
     const slugs = slug.split('/');
     try {
-      const findedPage = this.navigationRepository.findOneBySlug(slugs);
-
+      const findedPage = await this.navigationRepository.findOneBySlug(slugs);
       if (!findedPage)
         throw new InternalServerErrorException(
           'Navigation could not be finded',
