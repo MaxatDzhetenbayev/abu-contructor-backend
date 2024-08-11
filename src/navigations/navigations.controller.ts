@@ -13,6 +13,7 @@ import {
 import { NavigationsService } from './navigations.service';
 import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
+import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 
 @Controller('navigations')
 export class NavigationsController {
@@ -47,6 +48,12 @@ export class NavigationsController {
     @Body() updateNavigationDto: UpdateNavigationDto,
   ) {
     return this.navigationsService.update(+id, updateNavigationDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Patch('orders/update')
+  updateOrder(@Body() updateOrderDto: UpdateNavigationOrderDto[]) {
+    return this.navigationsService.updateOrder(updateOrderDto);
   }
 
   @Delete(':id')

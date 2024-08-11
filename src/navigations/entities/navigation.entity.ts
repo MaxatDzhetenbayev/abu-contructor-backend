@@ -41,6 +41,10 @@ export class Navigation extends Model {
           include: [{ model: Navigation, as: 'children' }],
         },
       ],
+      order: [
+        ['order', 'ASC'],
+        [{ model: Navigation, as: 'children' }, 'order', 'ASC'],
+      ],
     });
 
     return navigations.filter((navigation) => navigation.parent_id === null);
@@ -54,6 +58,10 @@ export class Navigation extends Model {
           as: 'children',
           include: [{ model: Navigation, as: 'children' }],
         },
+      ],
+      order: [
+        ['order', 'ASC'],
+        [{ model: Navigation, as: 'children' }, 'order', 'ASC'],
       ],
     });
 
@@ -104,6 +112,7 @@ export class Navigation extends Model {
           ],
         },
       ],
+      order: [[{ model: Widget, as: 'widgets' }, 'order', 'ASC']],
     });
 
     return currentpage;

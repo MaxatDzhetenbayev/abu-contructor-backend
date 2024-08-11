@@ -4,6 +4,7 @@ import { UpdateNavigationDto } from './dto/update-navigation.dto';
 import { Navigation } from './entities/navigation.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from 'src/widgets/entities/widget.entity';
+import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 
 @Injectable()
 export class NavigationsService {
@@ -85,6 +86,23 @@ export class NavigationsService {
       return findedPage;
     } catch (error) {
       throw new InternalServerErrorException('Navigation could not be finded');
+    }
+  }
+
+  async updateOrder(navigations: UpdateNavigationOrderDto[]) {
+    console.log(navigations);
+    try {
+      for (const { id, order } of navigations) {
+        const navigation = await this.navigationRepository.findByPk(id);
+        if (!navigation)
+          throw new InternalServerErrorException(
+            'Navigation could not be finded',
+          );
+        await navigation.update({ order });
+      }
+    } catch (error) {
+      // console.log(error);
+      throw new InternalServerErrorException('Navigation could not be updated');
     }
   }
 
