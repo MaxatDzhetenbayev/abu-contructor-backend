@@ -2,26 +2,26 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Content } from './contents.model';
+import { Content } from './entities/content.entity';
 
 @Injectable()
 export class ContentsService {
-
   constructor(
     @InjectModel(Content)
-    private contentRepository: typeof Content
-  ) { }
+    private contentRepository: typeof Content,
+  ) {}
 
   async create(createContentDto: CreateContentDto) {
     try {
-      const createdContent = await this.contentRepository.create(createContentDto);
+      const createdContent =
+        await this.contentRepository.create(createContentDto);
 
-      if (!createdContent) throw new InternalServerErrorException('Content could not be created');
+      if (!createdContent)
+        throw new InternalServerErrorException('Content could not be created');
 
       return createdContent;
     } catch (error) {
-
-      console.log(error)
+      console.log(error);
       throw new InternalServerErrorException('Content could not be created');
     }
   }

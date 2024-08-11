@@ -2,34 +2,28 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateWidgetDto } from './dto/create-widget.dto';
 import { UpdateWidgetDto } from './dto/update-widget.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Widget } from './widgets.model';
+import { Widget } from './entities/widget.entity';
 
 @Injectable()
 export class WidgetsService {
-
   constructor(
     @InjectModel(Widget)
-    private widgetRepository: typeof Widget
-  ) { }
+    private widgetRepository: typeof Widget,
+  ) {}
 
   async create(createWidgetDto: CreateWidgetDto) {
     try {
-
-      const createdWidget = await this.widgetRepository.create(
-        createWidgetDto
-      )
+      const createdWidget = await this.widgetRepository.create(createWidgetDto);
 
       if (!createdWidget) {
-        throw new InternalServerErrorException('Error creating widget')
+        throw new InternalServerErrorException('Error creating widget');
       }
 
-      return createdWidget
-
+      return createdWidget;
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException('Error creating widget')
+      console.log(error);
+      throw new InternalServerErrorException('Error creating widget');
     }
-
   }
 
   findAll() {

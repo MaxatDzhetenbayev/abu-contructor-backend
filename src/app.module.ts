@@ -3,11 +3,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { NavigationsModule } from './navigations/navigations.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Navigation } from './navigations/navigations.model';
+import { Navigation } from './navigations/entities/navigation.entity';
 import { WidgetsModule } from './widgets/widgets.module';
-import { Widget } from './widgets/widgets.model';
+import { Widget } from './widgets/entities/widget.entity';
 import { ContentsModule } from './contents/contents.module';
-import { Content } from './contents/contents.model';
+import { Content } from './contents/entities/content.entity';
 
 @Module({
   imports: [
@@ -22,9 +22,9 @@ import { Content } from './contents/contents.model';
     }),
     NavigationsModule,
     WidgetsModule,
-    ContentsModule
+    ContentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
