@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { WidgetsService } from './widgets.service';
 import { CreateWidgetDto } from './dto/create-widget.dto';
 import { UpdateWidgetDto } from './dto/update-widget.dto';
+import { UpdateWidgetOrderDto } from './dto/update-widget-order';
 
 @Controller('widgets')
 export class WidgetsController {
@@ -33,6 +36,12 @@ export class WidgetsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateWidgetDto: UpdateWidgetDto) {
     return this.widgetsService.update(+id, updateWidgetDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Patch('orders/update')
+  updateOrder(@Body() updateOrderDto: UpdateWidgetOrderDto[]) {
+    return this.widgetsService.updateOrder(updateOrderDto);
   }
 
   @Delete(':id')

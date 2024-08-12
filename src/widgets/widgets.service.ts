@@ -4,6 +4,7 @@ import { UpdateWidgetDto } from './dto/update-widget.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from './entities/widget.entity';
 import { NavigationsService } from 'src/navigations/navigations.service';
+import { UpdateWidgetOrderDto } from './dto/update-widget-order';
 
 @Injectable()
 export class WidgetsService {
@@ -32,6 +33,21 @@ export class WidgetsService {
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Error creating widget');
+    }
+  }
+
+  async updateOrder(navigations: UpdateWidgetOrderDto[]) {
+    console.log(navigations);
+    try {
+      for (const { id, order } of navigations) {
+        const navigation = await this.widgetRepository.findByPk(id);
+        if (!navigation)
+          throw new InternalServerErrorException('Widgets could not be finded');
+        await navigation.update({ order });
+      }
+    } catch (error) {
+      // console.log(error);
+      throw new InternalServerErrorException('Widgets could not be updated');
     }
   }
 

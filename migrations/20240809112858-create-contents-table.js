@@ -9,28 +9,27 @@ module.exports = {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       content: DataTypes.JSONB,
+      options: DataTypes.JSONB,
       widget_id: {
         type: DataTypes.INTEGER,
         references: {
           model: 'widgets',
           key: 'id',
-
         },
         onDelete: 'CASCADE',
       },
       createdAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
+        defaultValue: Sequelize.literal('NOW()'),
       },
       updatedAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('NOW()')
-      }
-    },
-    )
+        defaultValue: Sequelize.literal('NOW()'),
+      },
+    });
   },
 
   async down(queryInterface, Sequelize) {
@@ -40,5 +39,5 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-  }
+  },
 };

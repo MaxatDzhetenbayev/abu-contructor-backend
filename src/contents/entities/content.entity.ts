@@ -18,6 +18,14 @@ export class Content extends Model<Content> {
     allowNull: false,
   })
   content: {
+    [key: string]: Object;
+  };
+
+  @Column({
+    type: DataType.JSONB,
+    allowNull: false,
+  })
+  options: {
     [key: string]: any;
   };
 
