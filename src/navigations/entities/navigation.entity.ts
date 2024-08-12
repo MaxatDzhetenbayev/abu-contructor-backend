@@ -78,14 +78,14 @@ export class Navigation extends Model {
   }
 
   static async findOneBySlug(slugs: string[]) {
-    let currentParentId: number | null = null;
+    let currentId: number | null = null;
     let foundPage: Navigation | null = null;
 
     for (const slug of slugs) {
       foundPage = await this.findOne({
         where: {
           slug: slug,
-          parent_id: currentParentId,
+          parent_id: currentId,
         },
       });
 
@@ -93,12 +93,12 @@ export class Navigation extends Model {
         return null;
       }
 
-      currentParentId = foundPage.id;
+      currentId = foundPage.id;
     }
 
     const currentpage = await this.findOne({
       where: {
-        id: currentParentId,
+        id: currentId,
       },
       include: [
         {
