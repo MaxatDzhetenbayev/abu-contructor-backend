@@ -5,13 +5,14 @@ import { Navigation } from './entities/navigation.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from 'src/widgets/entities/widget.entity';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
+import { where } from 'sequelize';
 
 @Injectable()
 export class NavigationsService {
   constructor(
     @InjectModel(Navigation)
     private navigationRepository: typeof Navigation,
-  ) {}
+  ) { }
 
   async create(createNavigationDto: CreateNavigationDto) {
     try {
@@ -92,16 +93,48 @@ export class NavigationsService {
   async updateOrder(navigations: UpdateNavigationOrderDto[]) {
     console.log(navigations);
     try {
-      for (const { id, order } of navigations) {
+      for (const { id, order, parent_id } of navigations) {
         const navigation = await this.navigationRepository.findByPk(id);
         if (!navigation)
           throw new InternalServerErrorException(
             'Navigation could not be finded',
           );
-        await navigation.update({ order });
+
+        if (parent_id === undefined) {
+          await navigation.update({ order });
+        }
+        else {
+          const parentNavigation = await this.navigationRepository.findOneWithChildren(parent_id)
+          // if (parentNavigation && parentNavigation.children.length === 0) {
+          //   await navigation.update({ order: 1, parent_id })
+          // } 
+          // else {
+          const updatedNavigation = await navigation.update({ order, parent_id })
+          console.log(updatedNavigation.dataValues)
+          // parentNavigation.children.forEach(async (child) => {
+          //   console.log(child);
+          // await child.update({ order: )
+          // })
+
+          // if (updatedNavigation.parent_id === null) {
+          //   const navigationLevel1 = await this.navigationRepository.findAllWithChildren();
+          //   navigationLevel1.forEach(async (nav) => {
+          //     if (nav.order >= order && nav.id !== updatedNavigation.id) {
+          //       await nav.update({ order: nav.order + 1 })
+          //     }
+          //   })
+          // }
+
+          parentNavigation.children.forEach(async (child) => {
+            if (child.order >= order) {
+              await child.update({ order: child.order + 1 })
+            }
+          })
+          // }
+        }
       }
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       throw new InternalServerErrorException('Navigation could not be updated');
     }
   }
