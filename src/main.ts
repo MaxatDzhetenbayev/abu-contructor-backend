@@ -9,6 +9,7 @@ async function bootstrap() {
     transform: true, 
     forbidNonWhitelisted: true, 
   }));
+  app.enableCors();
   await app.listen(3003);
 }
 bootstrap();
