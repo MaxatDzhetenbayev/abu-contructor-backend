@@ -18,6 +18,7 @@ import { Content } from './contents/entities/content.entity';
       username: 'postgres',
       password: 'admin',
       database: 'abu',
+      logging: false,
       models: [Navigation, Widget, Content],
     }),
     NavigationsModule,
