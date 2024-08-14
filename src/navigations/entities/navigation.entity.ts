@@ -69,7 +69,7 @@ export class Navigation extends Model {
   }
 
   static async getnavigationOrder(parent_id?: number | undefined) {
-    if (parent_id !== undefined) {
+    if (parent_id) {
       const navigation = await this.findOneWithChildren(parent_id);
       return navigation.children.length + 1;
     }
