@@ -1,4 +1,4 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Transaction } from 'sequelize';
 import { BelongsTo, Column, HasMany, Model, Table } from 'sequelize-typescript';
 import { Content } from 'src/contents/entities/content.entity';
 import { Widget } from 'src/widgets/entities/widget.entity';
@@ -116,5 +116,18 @@ export class Navigation extends Model {
     });
 
     return currentpage;
+  }
+
+  static async recalculateOrder(navigations: Navigation[], transaction: Transaction) {
+    let orderCounter = 1;
+
+    for (const navigation of navigations) {
+      navigation.order = orderCounter++;
+      await navigation.save({ transaction });
+
+      if (navigation.children && navigation.children.length > 0) {
+        await this.recalculateOrder(navigation.children, transaction);
+      }
+    }
   }
 }
