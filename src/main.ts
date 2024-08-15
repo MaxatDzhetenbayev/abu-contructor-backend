@@ -6,10 +6,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe({
-    transform: true, 
-    forbidNonWhitelisted: true, 
+    transform: true,
+    forbidNonWhitelisted: true,
   }));
   app.enableCors();
+  app.setGlobalPrefix('api');
   await app.listen(3003);
 }
 bootstrap();
