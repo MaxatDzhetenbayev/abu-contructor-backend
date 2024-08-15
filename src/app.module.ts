@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
 import { NavigationsModule } from './navigations/navigations.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Navigation } from './navigations/entities/navigation.entity';
@@ -25,7 +24,5 @@ import { Content } from './contents/entities/content.entity';
     WidgetsModule,
     ContentsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
