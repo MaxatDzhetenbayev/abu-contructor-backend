@@ -19,6 +19,13 @@ export class ContentsController {
     return this.contentsService.findAll();
   }
 
+  @Get('by-widget-id/:widget_id')
+  findAllByWidgetId(
+    @Param('widget_id') widget_id: string,
+  ) {
+    return this.contentsService.findAllByWidgetId(+widget_id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.contentsService.findOne(+id);

@@ -9,7 +9,7 @@ export class ContentsService {
   constructor(
     @InjectModel(Content)
     private contentRepository: typeof Content,
-  ) {}
+  ) { }
 
   async create(createContentDto: CreateContentDto) {
     try {
@@ -28,6 +28,22 @@ export class ContentsService {
 
   findAll() {
     return `This action returns all contents`;
+  }
+
+  async findAllByWidgetId(widget_id: number) {
+    try {
+      const contents = await this.contentRepository.findAll({
+        where: { widget_id },
+      });
+
+      if (!contents)
+        throw new InternalServerErrorException('Contents could not be finded');
+
+      return contents;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Contents could not be finded');
+    }
   }
 
   findOne(id: number) {
