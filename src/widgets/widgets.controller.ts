@@ -16,7 +16,7 @@ import { UpdateWidgetOrderDto } from './dto/update-widget-order';
 
 @Controller('widgets')
 export class WidgetsController {
-  constructor(private readonly widgetsService: WidgetsService) {}
+  constructor(private readonly widgetsService: WidgetsService) { }
 
   @Post()
   create(@Body() createWidgetDto: CreateWidgetDto) {
@@ -33,10 +33,17 @@ export class WidgetsController {
     return this.widgetsService.findOne(+id);
   }
 
+  @Get('by-navigation-id/:navigation_id')
+  findByNavigationId(@Param('navigation_id') navigation_id: string) {
+    return this.widgetsService.findByNavigationId(+navigation_id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateWidgetDto: UpdateWidgetDto) {
     return this.widgetsService.update(+id, updateWidgetDto);
   }
+
+
 
   @HttpCode(HttpStatus.OK)
   @Patch('orders/update')
