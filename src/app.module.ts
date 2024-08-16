@@ -7,6 +7,7 @@ import { WidgetsModule } from './widgets/widgets.module';
 import { Widget } from './widgets/entities/widget.entity';
 import { ContentsModule } from './contents/contents.module';
 import { Content } from './contents/entities/content.entity';
+import { TemplateModule } from './template/template.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Content } from './contents/entities/content.entity';
     NavigationsModule,
     WidgetsModule,
     ContentsModule,
+    TemplateModule,
   ],
 })
 export class AppModule { }

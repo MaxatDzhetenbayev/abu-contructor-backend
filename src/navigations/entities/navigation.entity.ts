@@ -116,6 +116,7 @@ export class Navigation extends Model {
     });
 
     return currentpage;
+
   }
 
   static async recalculateOrder(navigations: Navigation[], transaction: Transaction) {
