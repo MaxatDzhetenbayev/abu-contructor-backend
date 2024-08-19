@@ -1,4 +1,9 @@
-import { HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateWidgetDto } from './dto/create-widget.dto';
 import { UpdateWidgetDto } from './dto/update-widget.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -13,11 +18,10 @@ export class WidgetsService {
     @InjectModel(Widget)
     private widgetRepository: typeof Widget,
     private navigationsService: NavigationsService,
-  ) { }
+  ) {}
   private readonly logger = new Logger(WidgetsService.name);
 
   async create(createWidgetDto: CreateWidgetDto) {
-
     this.logger.log('Создание виджета', { createWidgetDto });
 
     try {
@@ -45,14 +49,14 @@ export class WidgetsService {
     const transaction = await this.widgetRepository.sequelize.transaction();
     this.logger.log('Обновление порядка виджетов', { widgetOrders });
     try {
-      const widgetsIds = widgetOrders.map(widget => widget.id);
+      const widgetsIds = widgetOrders.map((widget) => widget.id);
       const widgetEntities = await this.widgetRepository.findAll({
         where: { id: widgetsIds },
         transaction,
       });
 
       for (const { id, order } of widgetOrders) {
-        const widgetEntity = widgetEntities.find(widget => widget.id === id);
+        const widgetEntity = widgetEntities.find((widget) => widget.id === id);
 
         if (!widgetEntity) {
           throw new InternalServerErrorException('Widget could not be found');
@@ -67,7 +71,7 @@ export class WidgetsService {
       return {
         statusCode: HttpStatus.OK,
         message: 'Widgets order updated successfully',
-      }
+      };
     } catch (error) {
       console.log(error);
       await transaction.rollback();
@@ -81,11 +85,13 @@ export class WidgetsService {
         where: { navigation_id },
         order: [['order', 'ASC']],
         attributes: ['id', 'widget_type', 'options', 'order'],
-        include: [{
-          model: Content,
-          as: 'contents',
-          attributes: ['id', 'content', 'options']
-        }],
+        include: [
+          {
+            model: Content,
+            as: 'contents',
+            attributes: ['id', 'content', 'options'],
+          },
+        ],
       });
 
       if (!widgets)
@@ -113,12 +119,25 @@ export class WidgetsService {
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Widget could not be found');
-
     }
   }
 
-  update(id: number, updateWidgetDto: UpdateWidgetDto) {
-    return `This action updates a #${id} widget`;
+  async update(id: number, updateWidgetDto: UpdateWidgetDto) {
+    this.logger.log('Обновление виджета', { id, updateWidgetDto });
+
+    try {
+      const widget = await this.widgetRepository.findByPk(id);
+
+      if (!widget)
+        throw new InternalServerErrorException('Widget could not be found');
+
+      widget.update(updateWidgetDto);
+
+      return widget;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Widget could not be updated');
+    }
   }
 
   async remove(id: number) {
@@ -133,7 +152,7 @@ export class WidgetsService {
       return {
         statusCode: HttpStatus.OK,
         message: 'Widget removed successfully',
-      }
+      };
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Widget could not be removed');

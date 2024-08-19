@@ -8,6 +8,9 @@ import { Widget } from './widgets/entities/widget.entity';
 import { ContentsModule } from './contents/contents.module';
 import { Content } from './contents/entities/content.entity';
 import { TemplateModule } from './template/template.module';
+import { FilesModule } from './files/files.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -21,10 +24,15 @@ import { TemplateModule } from './template/template.module';
       logging: false,
       models: [Navigation, Widget, Content],
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     NavigationsModule,
     WidgetsModule,
     ContentsModule,
     TemplateModule,
+    FilesModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
