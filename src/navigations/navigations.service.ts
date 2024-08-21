@@ -171,7 +171,20 @@ export class NavigationsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} navigation`;
+  async remove(id: number) {
+
+    this.logger.log('Увдаление навигаций', { id });
+    try {
+      const navigation = await this.navigationRepository.findByPk(id);
+      if (!navigation)
+        throw new InternalServerErrorException(
+          'Navigation could not be finded',
+        );
+
+      return navigation.destroy();
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Navigation could not be deleted');
+    }
   }
 }
