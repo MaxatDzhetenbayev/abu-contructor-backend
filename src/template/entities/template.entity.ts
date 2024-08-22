@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import { BelongsTo, Column, HasMany, Model, Table } from 'sequelize-typescript';
+import { Column, Model, Table } from 'sequelize-typescript';
 
 @Table({
     tableName: 'templates',

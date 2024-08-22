@@ -2,15 +2,19 @@ import { Module } from '@nestjs/common';
 
 import { NavigationsModule } from './navigations/navigations.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Navigation } from './navigations/entities/navigation.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+
 import { WidgetsModule } from './widgets/widgets.module';
-import { Widget } from './widgets/entities/widget.entity';
 import { ContentsModule } from './contents/contents.module';
-import { Content } from './contents/entities/content.entity';
 import { TemplateModule } from './template/template.module';
 import { FilesModule } from './files/files.module';
+
+import { Navigation } from './navigations/entities/navigation.entity';
+import { Widget } from './widgets/entities/widget.entity';
+import { Content } from './contents/entities/content.entity';
+import { Template } from './template/entities/template.entity';
+
 import { join } from 'path';
-import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -22,7 +26,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       password: 'admin',
       database: 'abu',
       logging: false,
-      models: [Navigation, Widget, Content],
+      models: [Navigation, Widget, Content, Template],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -35,4 +39,4 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     FilesModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
