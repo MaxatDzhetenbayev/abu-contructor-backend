@@ -13,8 +13,10 @@ import { Navigation } from './navigations/entities/navigation.entity';
 import { Widget } from './widgets/entities/widget.entity';
 import { Content } from './contents/entities/content.entity';
 import { Template } from './template/entities/template.entity';
+import { Auth } from './auth/entities/auth.entity';
 
 import { join } from 'path';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { join } from 'path';
       password: 'admin',
       database: 'abu',
       logging: false,
-      models: [Navigation, Widget, Content, Template],
+      models: [Navigation, Widget, Content, Template, Auth],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -37,6 +39,7 @@ import { join } from 'path';
     ContentsModule,
     TemplateModule,
     FilesModule,
+    AuthModule,
   ],
 })
 export class AppModule { }
