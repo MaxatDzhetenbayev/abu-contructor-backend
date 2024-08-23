@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -6,6 +6,9 @@ import { Content } from './entities/content.entity';
 
 @Injectable()
 export class ContentsService {
+
+  logger = new Logger('ContentsService');
+
   constructor(
     @InjectModel(Content)
     private contentRepository: typeof Content,
@@ -41,7 +44,7 @@ export class ContentsService {
 
       return contents;
     } catch (error) {
-      console.log(error);
+      this.logger.error(`Contents could not be finded`);
       throw new InternalServerErrorException('Contents could not be finded');
     }
   }
@@ -50,8 +53,21 @@ export class ContentsService {
     return `This action returns a #${id} content`;
   }
 
-  update(id: number, updateContentDto: UpdateContentDto) {
-    return `This action updates a #${id} content`;
+  async update(id: number, updateContentDto: UpdateContentDto) {
+    this.logger.log(`Updating content with id: ${id}`,);
+    try {
+      const content = await this.contentRepository.findByPk(id);
+
+      if (!content)
+        throw new InternalServerErrorException('Content could not be finded');
+
+      await content.update(updateContentDto);
+      this.logger.log(`Content with id: ${id} updated`);
+    } catch (error) {
+
+      this.logger.error(`Content with id: ${id} could not be updated`);
+      throw new InternalServerErrorException('Content could not be updated');
+    }
   }
 
   remove(id: number) {
