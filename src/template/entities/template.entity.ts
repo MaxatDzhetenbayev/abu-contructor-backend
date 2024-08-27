@@ -7,8 +7,8 @@ import { Column, Model, Table } from 'sequelize-typescript';
 })
 export class Template extends Model<Template> {
     @Column
-    name: string;
+    title: string;
 
     @Column({ type: DataTypes.ARRAY(DataTypes.STRING) })
-    widgets_list: string[];
+    widgets: string[];
 }

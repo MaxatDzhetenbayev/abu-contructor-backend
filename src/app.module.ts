@@ -17,6 +17,7 @@ import { Auth } from './auth/entities/auth.entity';
 
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -30,9 +31,22 @@ import { AuthModule } from './auth/auth.module';
       logging: false,
       models: [Navigation, Widget, Content, Template, Auth],
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const isProduction = configService.get<string>('NODE_ENV') === 'production';
+        const rootPath = isProduction
+          ? join(__dirname, '..', 'dist', 'uploads')
+          : join(__dirname, '..', 'uploads');
+
+        return [
+          {
+            rootPath,
+            serveRoot: '/uploads',
+          },
+        ];
+      },
     }),
     NavigationsModule,
     WidgetsModule,
