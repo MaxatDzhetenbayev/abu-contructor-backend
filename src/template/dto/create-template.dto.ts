@@ -5,7 +5,7 @@ import {
 
 export class CreateTemplateDto {
     @IsString()
-    name: string;
+    title: string;
     @IsArray()
-    widgets_list: string[];
+    widgets: string[];
 }

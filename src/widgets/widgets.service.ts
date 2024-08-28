@@ -18,7 +18,7 @@ export class WidgetsService {
     @InjectModel(Widget)
     private widgetRepository: typeof Widget,
     private navigationsService: NavigationsService,
-  ) {}
+  ) { }
   private readonly logger = new Logger(WidgetsService.name);
 
   async create(createWidgetDto: CreateWidgetDto) {

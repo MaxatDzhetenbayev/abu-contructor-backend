@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { TemplateService } from './template.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
-import { UpdateTemplateDto } from './dto/update-template.dto';
+import { UpdateTemplateOrderDto } from './dto/update-template-order.dto';
 
 @Controller('template')
 export class TemplateController {
-  constructor(private readonly templateService: TemplateService) {}
+  constructor(private readonly templateService: TemplateService) { }
 
   @Post()
   create(@Body() createTemplateDto: CreateTemplateDto) {
@@ -22,9 +22,15 @@ export class TemplateController {
     return this.templateService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTemplateDto: UpdateTemplateDto) {
-    return this.templateService.update(+id, updateTemplateDto);
+  @Get('search')
+  search(@Query() query: { title: string }) {
+    const { title } = query
+    return this.templateService.findByTitle(title);
+  }
+
+  @Patch('v2/orders/update/:id')
+  updateOrder(@Param('id') id: string, @Body() updateTemplateDto: UpdateTemplateOrderDto) {
+    return this.templateService.updateOrder(+id, updateTemplateDto);
   }
 
   @Delete(':id')

@@ -5,6 +5,9 @@ import { Column, Model, Table } from 'sequelize-typescript';
     tableName: 'templates',
     timestamps: true,
 })
+
+
+
 export class Template extends Model<Template> {
     @Column
     title: string;

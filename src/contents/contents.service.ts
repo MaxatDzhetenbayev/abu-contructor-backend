@@ -61,7 +61,10 @@ export class ContentsService {
       if (!content)
         throw new InternalServerErrorException('Content could not be finded');
 
-      await content.update(updateContentDto);
+      await content.update({
+        content: { ...content.content, ...updateContentDto.content },
+        options: { ...content.options, ...updateContentDto.options },
+      });
       this.logger.log(`Content with id: ${id} updated`);
     } catch (error) {
 
