@@ -17,6 +17,9 @@ export class NavigationsService {
   ) { }
 
   async create(createNavigationDto: CreateNavigationDto) {
+
+    this.logger.log('Создание навигации', { createNavigationDto });
+
     try {
       const order = await this.navigationRepository.getnavigationOrder(
         createNavigationDto.parent_id,
@@ -31,6 +34,8 @@ export class NavigationsService {
         throw new InternalServerErrorException(
           'Navigation could not be created',
         );
+
+      this.logger.log('Навигация создана', { navigation });
 
       return navigation;
     } catch (error) {
@@ -172,14 +177,16 @@ export class NavigationsService {
   }
 
   async remove(id: number) {
-
-    this.logger.log('Увдаление навигаций', { id });
     try {
+      this.logger.log('Увдаление навигаций', { id });
       const navigation = await this.navigationRepository.findByPk(id);
       if (!navigation)
         throw new InternalServerErrorException(
           'Navigation could not be finded',
         );
+
+
+      this.logger.log('Удаление навигации', { navigation });
 
       return navigation.destroy();
     } catch (error) {

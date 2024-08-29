@@ -49,8 +49,19 @@ export class ContentsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} content`;
+  async findOne(id: number) {
+    try {
+
+      const content = await this.contentRepository.findByPk(id);
+
+      if (!content)
+        throw new InternalServerErrorException('Content could not be finded');
+
+      return content;
+    } catch (error) {
+      this.logger.error(`Content with id: ${id} could not be finded. Error: ${error}`);
+      throw new InternalServerErrorException('Content could not be finded');
+    }
   }
 
   async update(id: number, updateContentDto: UpdateContentDto) {
@@ -68,7 +79,7 @@ export class ContentsService {
       this.logger.log(`Content with id: ${id} updated`);
     } catch (error) {
 
-      this.logger.error(`Content with id: ${id} could not be updated`);
+      this.logger.error(`Content with id: ${id} could not be updated, error: ${error}`);
       throw new InternalServerErrorException('Content could not be updated');
     }
   }
