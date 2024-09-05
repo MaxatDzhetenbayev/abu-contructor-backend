@@ -31,23 +31,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       logging: false,
       models: [Navigation, Widget, Content, Template, Auth],
     }),
-    ServeStaticModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const isProduction = configService.get<string>('NODE_ENV') === 'production';
-        const rootPath = isProduction
-          ? join(__dirname, '..', 'dist', 'uploads')
-          : join(__dirname, '..', 'uploads');
-
-        return [
-          {
-            rootPath,
-            serveRoot: '/uploads',
-          },
-        ];
-      },
-    }),
+    ServeStaticModule.forRoot({
+		rootPath: join(__dirname, '..', 'uploads'),
+		serveRoot: '/uploads',
+	 }),
     NavigationsModule,
     WidgetsModule,
     ContentsModule,
@@ -56,4 +43,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     AuthModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

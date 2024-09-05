@@ -30,8 +30,10 @@ export class FilesController {
   @HttpCode(HttpStatus.CREATED)
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     try {
+      console.log(file.filename);
       return file.filename;
     } catch (error) {
+      console.log(error);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
