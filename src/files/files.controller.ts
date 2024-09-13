@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { extname, join, } from 'path';
 
 @Controller('upload')
 export class FilesController {
@@ -17,7 +17,7 @@ export class FilesController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: join(__dirname, '..', 'uploads'),
+        destination: join(__dirname, '..', '..', 'uploads'),
         filename: (req, file, callback) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -30,6 +30,7 @@ export class FilesController {
   @HttpCode(HttpStatus.CREATED)
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     try {
+      console.log(__dirname);
       console.log(file.filename);
       return file.filename;
     } catch (error) {
