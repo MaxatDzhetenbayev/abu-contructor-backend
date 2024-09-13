@@ -32,7 +32,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       models: [Navigation, Widget, Content, Template, Auth],
     }),
     ServeStaticModule.forRoot({
-		rootPath: join(__dirname, '..', 'uploads'),
+		rootPath: join(__dirname, '..',  'uploads'),
 		serveRoot: '/uploads',
 	 }),
     NavigationsModule,

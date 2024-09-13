@@ -41,11 +41,17 @@ export class Navigation extends Model {
           include: [{ model: Navigation, as: 'children' }],
         },
       ],
-      order: [
-        ['order', 'ASC'],
-        [{ model: Navigation, as: 'children' }, 'order', 'ASC'],
-      ],
+      order: [['order', 'ASC']],
     });
+
+    const sortChildren = (navigation) => {
+      if (navigation.children) {
+        navigation.children.sort((a, b) => a.order - b.order);
+        navigation.children.forEach(sortChildren);
+      }
+    };
+
+    navigations.forEach(sortChildren);
 
     return navigations.filter((navigation) => navigation.parent_id === null);
   }
@@ -116,19 +122,17 @@ export class Navigation extends Model {
     });
 
     return currentpage;
-
   }
 
-  static async recalculateOrder(navigations: Navigation[], transaction: Transaction) {
+  static async recalculateOrder(
+    navigations: Navigation[],
+    transaction: Transaction,
+  ) {
     let orderCounter = 1;
 
     for (const navigation of navigations) {
       navigation.order = orderCounter++;
       await navigation.save({ transaction });
-
-      if (navigation.children && navigation.children.length > 0) {
-        await this.recalculateOrder(navigation.children, transaction);
-      }
     }
   }
 }

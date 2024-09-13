@@ -15,6 +15,12 @@ import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 
+interface UpdateNavigationOrderDtoNew {
+  id: number;
+  target_id: number;
+  parent_id?: number | null;
+}
+
 @Controller('navigations')
 export class NavigationsController {
   constructor(private readonly navigationsService: NavigationsService) {}
@@ -54,6 +60,11 @@ export class NavigationsController {
   @Patch('orders/update')
   updateOrder(@Body() updateOrderDto: UpdateNavigationOrderDto[]) {
     return this.navigationsService.updateOrder(updateOrderDto);
+  }
+  @HttpCode(HttpStatus.OK)
+  @Patch('orders/update-new')
+  updateOrderNew(@Body() updateOrderDto: UpdateNavigationOrderDtoNew) {
+    return this.navigationsService.updateOrderNew(updateOrderDto);
   }
 
   @Delete(':id')

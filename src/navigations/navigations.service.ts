@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
 import { Navigation } from './entities/navigation.entity';
@@ -7,6 +13,12 @@ import { Widget } from 'src/widgets/entities/widget.entity';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 import { Transaction, where } from 'sequelize';
 
+interface UpdateNavigationOrderDtoNew {
+  id: number;
+  target_id: number;
+  parent_id?: number | null;
+}
+
 @Injectable()
 export class NavigationsService {
   private readonly logger = new Logger(NavigationsService.name);
@@ -14,10 +26,46 @@ export class NavigationsService {
   constructor(
     @InjectModel(Navigation)
     private navigationRepository: typeof Navigation,
-  ) { }
+  ) {}
+
+  async updateOrderNew(navigationNewOption: UpdateNavigationOrderDtoNew) {
+    const { id, target_id, parent_id } = navigationNewOption;
+    const transaction = await this.navigationRepository.sequelize.transaction();
+    this.logger.log('Обновление порядка навигации', { navigationNewOption });
+    try {
+      const navigationItem = await this.navigationRepository.findOne({
+        where: { id },
+      });
+
+      const targetNavigationItem =
+        await this.navigationRepository.findByPk(target_id);
+
+      if (navigationItem.parent_id === targetNavigationItem.parent_id) {
+        const navigationEntities = await this.navigationRepository.findAll({
+          where: { parent_id: navigationItem.parent_id },
+        });
+
+        for (const { id, order } of navigationEntities) {
+
+        }
+
+        return {
+          triggeredItem: navigationItem,
+          targetItem: targetNavigationItem,
+          list: navigationEntities,
+        };
+      }
+
+      // console.log(targetNavigationItem.parent_id);
+      // console.log(targetNavigationItem);
+    } catch (error) {
+      await transaction.rollback();
+      console.log(error);
+      throw new InternalServerErrorException('Navigation could not be updated');
+    }
+  }
 
   async create(createNavigationDto: CreateNavigationDto) {
-
     this.logger.log('Создание навигации', { createNavigationDto });
 
     try {
@@ -59,7 +107,7 @@ export class NavigationsService {
     }
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     try {
       const navigation = this.navigationRepository.findOne({
         where: { id },
@@ -100,9 +148,10 @@ export class NavigationsService {
   async updateOrder(navigations: UpdateNavigationOrderDto[]) {
     const transaction = await this.navigationRepository.sequelize.transaction();
     this.logger.log('Обновление порядка навигации', { navigations });
+
     try {
       // Загружаются все навигации, которые будут обновляться
-      const navigationIds = navigations.map(nav => nav.id);
+      const navigationIds = navigations.map((nav) => nav.id);
       const navigationEntities = await this.navigationRepository.findAll({
         where: { id: navigationIds },
         include: [{ model: Navigation, as: 'children' }],
@@ -111,17 +160,23 @@ export class NavigationsService {
 
       // Каждая навигация обновялется
       for (const { id, order, parent_id } of navigations) {
-        const navigation = navigationEntities.find(nav => nav.id === id);
+        const navigation = navigationEntities.find((nav) => nav.id === id);
 
         if (parent_id) {
-          const parentNavigation = await this.navigationRepository.findByPk(parent_id);
-          if (parentNavigation.navigation_type !== 'group') {
-            throw new HttpException('Cannot add child navigation to a non-group navigation', HttpStatus.BAD_REQUEST);
+          const parentNavigation =
+            await this.navigationRepository.findByPk(parent_id);
+          if (parentNavigation.navigation_type !== 'group' && parentNavigation.navigation_type !== 'group-link') {
+            throw new HttpException(
+              'Cannot add child navigation to a non-group navigation',
+              HttpStatus.BAD_REQUEST,
+            );
           }
         }
 
         if (!navigation) {
-          throw new InternalServerErrorException('Navigation could not be found');
+          throw new InternalServerErrorException(
+            'Navigation could not be found',
+          );
         }
 
         // Обновляем `parent_id` и `order`, если изменились
@@ -129,32 +184,33 @@ export class NavigationsService {
           navigation.parent_id = parent_id;
           navigation.order = order;
           await navigation.save({ transaction });
+
+          // Пересчитываем порядок только для затронутого уровня
+          const siblings = await this.navigationRepository.findAll({
+            where: { parent_id: parent_id || null },
+            order: [['order', 'ASC']],
+            transaction,
+          });
+
+          await this.navigationRepository.recalculateOrder(
+            siblings,
+            transaction,
+          );
         }
       }
-
-      // Пересчитываем порядок для всех элементов на каждом уровне
-      const allNavigations = await this.navigationRepository.findAll({
-        where: { parent_id: null },
-        include: [{ model: Navigation, as: 'children' }],
-        order: [['order', 'ASC']],
-        transaction,
-      });
-
-      await this.navigationRepository.recalculateOrder(allNavigations, transaction);
 
       await transaction.commit();
 
       return {
         statusCode: HttpStatus.OK,
         message: 'Navigation order updated successfully',
-      }
+      };
     } catch (error) {
       await transaction.rollback();
       console.log(error);
       throw new InternalServerErrorException('Navigation could not be updated');
     }
   }
-
 
   async update(id: number, updateNavigationDto: UpdateNavigationDto) {
     try {
@@ -184,7 +240,6 @@ export class NavigationsService {
         throw new InternalServerErrorException(
           'Navigation could not be finded',
         );
-
 
       this.logger.log('Удаление навигации', { navigation });
 
