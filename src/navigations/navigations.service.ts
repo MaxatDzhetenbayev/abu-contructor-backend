@@ -11,13 +11,7 @@ import { Navigation } from './entities/navigation.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from 'src/widgets/entities/widget.entity';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
-import { Transaction, where } from 'sequelize';
 
-interface UpdateNavigationOrderDtoNew {
-  id: number;
-  target_id: number;
-  parent_id?: number | null;
-}
 
 @Injectable()
 export class NavigationsService {
@@ -26,44 +20,8 @@ export class NavigationsService {
   constructor(
     @InjectModel(Navigation)
     private navigationRepository: typeof Navigation,
-  ) {}
+  ) { }
 
-  async updateOrderNew(navigationNewOption: UpdateNavigationOrderDtoNew) {
-    const { id, target_id, parent_id } = navigationNewOption;
-    const transaction = await this.navigationRepository.sequelize.transaction();
-    this.logger.log('Обновление порядка навигации', { navigationNewOption });
-    try {
-      const navigationItem = await this.navigationRepository.findOne({
-        where: { id },
-      });
-
-      const targetNavigationItem =
-        await this.navigationRepository.findByPk(target_id);
-
-      if (navigationItem.parent_id === targetNavigationItem.parent_id) {
-        const navigationEntities = await this.navigationRepository.findAll({
-          where: { parent_id: navigationItem.parent_id },
-        });
-
-        for (const { id, order } of navigationEntities) {
-
-        }
-
-        return {
-          triggeredItem: navigationItem,
-          targetItem: targetNavigationItem,
-          list: navigationEntities,
-        };
-      }
-
-      // console.log(targetNavigationItem.parent_id);
-      // console.log(targetNavigationItem);
-    } catch (error) {
-      await transaction.rollback();
-      console.log(error);
-      throw new InternalServerErrorException('Navigation could not be updated');
-    }
-  }
 
   async create(createNavigationDto: CreateNavigationDto) {
     this.logger.log('Создание навигации', { createNavigationDto });
@@ -163,8 +121,7 @@ export class NavigationsService {
         const navigation = navigationEntities.find((nav) => nav.id === id);
 
         if (parent_id) {
-          const parentNavigation =
-            await this.navigationRepository.findByPk(parent_id);
+          const parentNavigation = await this.navigationRepository.findByPk(parent_id);
           if (parentNavigation.navigation_type !== 'group' && parentNavigation.navigation_type !== 'group-link') {
             throw new HttpException(
               'Cannot add child navigation to a non-group navigation',

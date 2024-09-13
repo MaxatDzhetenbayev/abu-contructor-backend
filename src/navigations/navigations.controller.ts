@@ -23,7 +23,7 @@ interface UpdateNavigationOrderDtoNew {
 
 @Controller('navigations')
 export class NavigationsController {
-  constructor(private readonly navigationsService: NavigationsService) {}
+  constructor(private readonly navigationsService: NavigationsService) { }
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
@@ -60,11 +60,6 @@ export class NavigationsController {
   @Patch('orders/update')
   updateOrder(@Body() updateOrderDto: UpdateNavigationOrderDto[]) {
     return this.navigationsService.updateOrder(updateOrderDto);
-  }
-  @HttpCode(HttpStatus.OK)
-  @Patch('orders/update-new')
-  updateOrderNew(@Body() updateOrderDto: UpdateNavigationOrderDtoNew) {
-    return this.navigationsService.updateOrderNew(updateOrderDto);
   }
 
   @Delete(':id')
