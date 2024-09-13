@@ -1,16 +1,18 @@
 import {
   Controller,
+  Delete,
   HttpCode,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join, } from 'path';
-
+import { extname, join, resolve, } from 'path';
+import * as fs from 'fs'
 @Controller('upload')
 export class FilesController {
   @Post()
@@ -33,6 +35,28 @@ export class FilesController {
       console.log(__dirname);
       console.log(file.filename);
       return file.filename;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Delete(':fileName')
+  deleteFile(@Param('fileName') fileName: string) {
+    try {
+      const uploadDir = resolve(__dirname, '..', '..', 'uploads');
+      const filePath = join(uploadDir, fileName);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          throw new Error(`Не удалось удалить файл: ${err.message}`);
+        }
+        console.log(`Файл ${fileName} успешно удален.`);
+      });
+
+      return {
+        message: `File - ${fileName} deleted successfully`,
+      };
     } catch (error) {
       console.log(error);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
