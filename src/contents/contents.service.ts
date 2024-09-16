@@ -1,8 +1,9 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Content } from './entities/content.entity';
+import { UpdateContentOrderDto } from './dto/update-content-order.dto';
 
 @Injectable()
 export class ContentsService {
@@ -37,6 +38,7 @@ export class ContentsService {
     try {
       const contents = await this.contentRepository.findAll({
         where: { widget_id },
+        order: [['order', 'ASC']],
       });
 
       if (!contents)
@@ -86,5 +88,41 @@ export class ContentsService {
 
   remove(id: number) {
     return `This action removes a #${id} content`;
+  }
+
+
+
+  async updateOrder(widgetOrders: UpdateContentOrderDto[]) {
+    const transaction = await this.contentRepository.sequelize.transaction();
+    this.logger.log('Обновление порядка контента', { widgetOrders });
+    try {
+      const widgetsIds = widgetOrders.map((widget) => widget.id);
+      const widgetEntities = await this.contentRepository.findAll({
+        where: { id: widgetsIds },
+        transaction,
+      });
+
+      for (const { id, order } of widgetOrders) {
+        const widgetEntity = widgetEntities.find((widget) => widget.id === id);
+
+        if (!widgetEntity) {
+          throw new InternalServerErrorException('Content could not be found');
+        }
+
+        widgetEntity.order = order;
+        await widgetEntity.save({ transaction });
+      }
+
+      await transaction.commit();
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Contents order updated successfully',
+      };
+    } catch (error) {
+      console.log(error);
+      await transaction.rollback();
+      throw new InternalServerErrorException('Contents could not be updated');
+    }
   }
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
+import { UpdateContentOrderDto } from './dto/update-content-order.dto';
 
 @Controller('contents')
 export class ContentsController {
@@ -39,5 +40,12 @@ export class ContentsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.contentsService.remove(+id);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Patch('orders/update')
+  updateOrder(@Body() updateOrderDto: UpdateContentOrderDto[]) {
+    console.log(updateOrderDto)
+    return this.contentsService.updateOrder(updateOrderDto);
   }
 }
