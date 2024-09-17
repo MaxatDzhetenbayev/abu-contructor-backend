@@ -4,6 +4,7 @@ import { UpdateContentDto } from './dto/update-content.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Content } from './entities/content.entity';
 import { UpdateContentOrderDto } from './dto/update-content-order.dto';
+import { WidgetsService } from 'src/widgets/widgets.service';
 
 @Injectable()
 export class ContentsService {
@@ -13,12 +14,16 @@ export class ContentsService {
   constructor(
     @InjectModel(Content)
     private contentRepository: typeof Content,
+    private widgetsService: WidgetsService,
   ) { }
 
   async create(createContentDto: CreateContentDto) {
     try {
+
+      const widget = await this.widgetsService.findOne(createContentDto.widget_id);
+
       const createdContent =
-        await this.contentRepository.create(createContentDto);
+        await this.contentRepository.create({ ...createContentDto, order: widget.contents.length + 1 });
 
       if (!createdContent)
         throw new InternalServerErrorException('Content could not be created');
