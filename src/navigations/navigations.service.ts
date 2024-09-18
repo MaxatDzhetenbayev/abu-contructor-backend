@@ -111,7 +111,7 @@ export class NavigationsService {
       for (let i = 0; i < slugs.length; i++) {
         const findedPage = await this.navigationRepository.findOneBySlug(slugs.slice(0, i + 1));
         if (findedPage) {
-          crumbs.push(findedPage.title[locale]);
+          crumbs.push({ title: findedPage.title[locale], navigation_type: findedPage.navigation_type });
         }
       }
 
