@@ -20,8 +20,8 @@ export class ContentsService {
   async create(createContentDto: CreateContentDto) {
     try {
 
-      const widget = await this.widgetsService.findOne(createContentDto.widget_id);
-
+      const widget = await this.widgetsService.findOneWithContents(createContentDto.widget_id);
+      console.log(widget)
       const createdContent =
         await this.contentRepository.create({ ...createContentDto, order: widget.contents.length + 1 });
 

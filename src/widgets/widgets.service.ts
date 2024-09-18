@@ -122,6 +122,27 @@ export class WidgetsService {
     }
   }
 
+  findOneWithContents(id: number) {
+    try {
+      const widget = this.widgetRepository.findByPk(id, {
+        include: [
+          {
+            model: Content,
+            as: 'contents',
+          },
+        ],
+      });
+
+      if (!widget)
+        throw new InternalServerErrorException('Widget could not be found');
+
+      return widget;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Widget could not be found');
+    }
+  }
+
   async update(id: number, updateWidgetDto: UpdateWidgetDto) {
     this.logger.log('Обновление виджета', { id, updateWidgetDto });
 

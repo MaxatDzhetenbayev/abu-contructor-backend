@@ -108,7 +108,6 @@ export class NavigationsService {
     const slugs = slug.split(',');
     const crumbs = [];
 
-    console.log(slugs)
     try {
 
       for (let i = 0; i < slugs.length; i++) {
