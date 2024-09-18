@@ -110,8 +110,11 @@ export class NavigationsService {
 
       for (let i = 0; i < slugs.length; i++) {
         const findedPage = await this.navigationRepository.findOneBySlug(slugs.slice(0, i + 1));
+
+        const sendData = { title: findedPage.title[locale], navigation_type: findedPage.navigation_type, slug: slugs.slice(0, i + 1).join('/') };
+
         if (findedPage) {
-          crumbs.push({ title: findedPage.title[locale], navigation_type: findedPage.navigation_type });
+          crumbs.push(sendData);
         }
       }
 
