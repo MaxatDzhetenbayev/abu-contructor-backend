@@ -104,8 +104,11 @@ export class NavigationsService {
   }
 
   async getNaivagtionCrumbs(slug: string, locale: string): Promise<string[]> {
-    const slugs = slug.split('/');
+
+    const slugs = slug.split(',');
     const crumbs = [];
+
+    console.log(slugs)
     try {
 
       for (let i = 0; i < slugs.length; i++) {
