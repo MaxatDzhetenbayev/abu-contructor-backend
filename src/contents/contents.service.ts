@@ -91,8 +91,23 @@ export class ContentsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} content`;
+  async remove(id: number) {
+    try {
+
+      const content = await this.contentRepository.findByPk(id);
+      if (!content)
+        throw new InternalServerErrorException('Content could not be finded');
+
+      content.destroy();
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Content deleted successfully',
+      };
+    } catch (error) {
+      this.logger.error(`Content with id: ${id} could not be deleted, error: ${error}`);
+      throw new InternalServerErrorException('Content could not be deleted');
+    }
   }
 
 
