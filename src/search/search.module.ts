@@ -10,4 +10,4 @@ import { Widget } from 'src/widgets/entities/widget.entity';
   providers: [SearchService],
   imports: [SequelizeModule.forFeature([Navigation, Widget])],
 })
-export class SearchModule {}
+export class SearchModule { }

@@ -14,11 +14,11 @@ import { UpdateSearchDto } from './dto/update-search.dto';
 
 @Controller('search')
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(private readonly searchService: SearchService) { }
 
   @Get()
-  findAll(@Query() { query, local }: { query: string; local: string }) {
-    return this.searchService.findByQueryString(query, local);
+  findAll(@Query() { query, locale }: { query: string; locale: string }) {
+    return this.searchService.findByQueryString(query, locale);
   }
 
   //   @Get(':id')
