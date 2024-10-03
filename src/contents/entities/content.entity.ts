@@ -33,6 +33,9 @@ export class Content extends Model<Content> {
   @Column
   widget_id: number;
 
+  @Column
+  order: number;
+
   @BelongsTo(() => Widget)
   widget: Widget;
 }

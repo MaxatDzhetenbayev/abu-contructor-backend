@@ -9,5 +9,6 @@ import { NavigationsModule } from 'src/navigations/navigations.module';
   imports: [SequelizeModule.forFeature([Widget]), NavigationsModule],
   controllers: [WidgetsController],
   providers: [WidgetsService],
+  exports: [WidgetsService]
 })
-export class WidgetsModule {}
+export class WidgetsModule { }

@@ -118,7 +118,10 @@ export class Navigation extends Model {
           ],
         },
       ],
-      order: [[{ model: Widget, as: 'widgets' }, 'order', 'ASC']],
+      order: [
+        [{ model: Widget, as: 'widgets' }, 'order', 'ASC'],
+        [{ model: Widget, as: 'widgets' }, { model: Content, as: 'contents' }, 'order', 'ASC'],
+      ],
     });
 
     return currentpage;

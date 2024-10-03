@@ -103,6 +103,29 @@ export class NavigationsService {
     }
   }
 
+  async getNaivagtionCrumbs(slug: string, locale: string): Promise<string[]> {
+
+    const slugs = slug.split(',');
+    const crumbs = [];
+
+    try {
+
+      for (let i = 0; i < slugs.length; i++) {
+        const findedPage = await this.navigationRepository.findOneBySlug(slugs.slice(0, i + 1));
+
+        const sendData = { title: findedPage.title[locale], navigation_type: findedPage.navigation_type, slug: slugs.slice(0, i + 1).join('/') };
+
+        if (findedPage) {
+          crumbs.push(sendData);
+        }
+      }
+
+      return crumbs;
+    } catch (error) {
+      throw new InternalServerErrorException('Navigation could not be finded');
+    }
+  }
+
   async updateOrder(navigations: UpdateNavigationOrderDto[]) {
     const transaction = await this.navigationRepository.sequelize.transaction();
     this.logger.log('Обновление порядка навигации', { navigations });

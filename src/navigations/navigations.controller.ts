@@ -48,6 +48,12 @@ export class NavigationsController {
     return this.navigationsService.findBySlug(slug);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Get('get/crumbs')
+  getCrumb(@Query('slug') slug: string, @Query('locale') locale: string) {
+    return this.navigationsService.getNaivagtionCrumbs(slug, locale)
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -61,6 +67,8 @@ export class NavigationsController {
   updateOrder(@Body() updateOrderDto: UpdateNavigationOrderDto[]) {
     return this.navigationsService.updateOrder(updateOrderDto);
   }
+
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {
