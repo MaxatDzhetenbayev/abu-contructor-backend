@@ -7,6 +7,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { WidgetsModule } from './widgets/widgets.module';
 import { ContentsModule } from './contents/contents.module';
 import { TemplateModule } from './template/template.module';
+import { SearchModule } from './search/search.module';
 import { FilesModule } from './files/files.module';
 
 import { Navigation } from './navigations/entities/navigation.entity';
@@ -38,9 +39,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     NavigationsModule,
     WidgetsModule,
     ContentsModule,
+    SearchModule,
     TemplateModule,
     FilesModule,
     AuthModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
