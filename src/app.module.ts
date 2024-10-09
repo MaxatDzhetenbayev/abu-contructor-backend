@@ -24,11 +24,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   imports: [
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'admin',
-      database: 'abu',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB,
       logging: false,
       models: [Navigation, Widget, Content, Template, Auth],
     }),
