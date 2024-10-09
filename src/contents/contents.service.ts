@@ -5,7 +5,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Content } from './entities/content.entity';
 import { UpdateContentOrderDto } from './dto/update-content-order.dto';
 import { WidgetsService } from 'src/widgets/widgets.service';
-
+import * as fs from 'fs';
+import path from 'path';
 @Injectable()
 export class ContentsService {
 
@@ -94,18 +95,26 @@ export class ContentsService {
   async remove(id: number) {
     try {
 
-      const content = await this.contentRepository.findByPk(id);
-      if (!content)
+      const findedItem = await this.contentRepository.findByPk(id);
+      if (!findedItem)
         throw new InternalServerErrorException('Content could not be finded');
 
-      content.destroy();
+
+      const { content } = findedItem
+
+      if (content && content.image) {
+        const image = content.image as string;
+        const filePath = path.join(__dirname, 'uploads', image);
+        fs.unlinkSync(filePath);
+      }
+      // content.destroy();
 
       return {
         statusCode: HttpStatus.OK,
         message: 'Content deleted successfully',
       };
     } catch (error) {
-      this.logger.error(`Content with id: ${id} could not be deleted, error: ${error}`);
+      this.logger.error(`Content with id: ${id} could not be deleted, error: ${error} `);
       throw new InternalServerErrorException('Content could not be deleted');
     }
   }
