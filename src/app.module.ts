@@ -18,10 +18,14 @@ import { Auth } from './auth/entities/auth.entity';
 
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
+
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.DB_HOST,
@@ -45,4 +49,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     AuthModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
