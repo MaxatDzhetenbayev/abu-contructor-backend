@@ -1,3 +1,4 @@
+import sequelize from 'sequelize';
 import { DataTypes, Transaction } from 'sequelize';
 import { BelongsTo, Column, HasMany, Model, Table } from 'sequelize-typescript';
 import { Content } from 'src/contents/entities/content.entity';
@@ -34,6 +35,11 @@ export class Navigation extends Model {
 
   static async findAllWithChildren() {
     const navigations = await this.findAll({
+      where: {
+        navigation_type: {
+          [sequelize.Op.ne]: "detail"
+        }
+      },
       include: [
         {
           model: Navigation,
