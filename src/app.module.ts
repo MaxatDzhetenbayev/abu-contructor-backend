@@ -19,6 +19,7 @@ import { Auth } from './auth/entities/auth.entity';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { NewsModule } from './news/news.module';
 
 
 @Module({
@@ -47,6 +48,7 @@ import { ConfigModule } from '@nestjs/config';
     TemplateModule,
     FilesModule,
     AuthModule,
+    NewsModule,
   ],
 })
 export class AppModule { }
