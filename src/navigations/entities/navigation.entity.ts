@@ -35,16 +35,19 @@ export class Navigation extends Model {
 
   static async findAllWithChildren() {
     const navigations = await this.findAll({
-      where: {
-        navigation_type: {
-          [sequelize.Op.ne]: "detail"
-        }
-      },
       include: [
         {
           model: Navigation,
           as: 'children',
-          include: [{ model: Navigation, as: 'children' }],
+          include: [{
+            model: Navigation,
+            as: 'children',
+            where: {
+              navigation_type: {
+                [sequelize.Op.ne]: "detail"
+              }
+            },
+          }],
         },
       ],
       order: [['order', 'ASC']],
