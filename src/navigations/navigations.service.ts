@@ -5,7 +5,9 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { QueryTypes } from 'sequelize'
 import { CreateNavigationDto } from './dto/create-navigation.dto';
+import { Sequelize } from 'sequelize-typescript';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
 import { Navigation } from './entities/navigation.entity';
 import { InjectModel } from '@nestjs/sequelize';
@@ -20,6 +22,7 @@ export class NavigationsService {
   constructor(
     @InjectModel(Navigation)
     private navigationRepository: typeof Navigation,
+    private readonly sequelize: Sequelize
   ) { }
 
 
@@ -52,13 +55,53 @@ export class NavigationsService {
 
   async findAll() {
     try {
-      const navigations = await this.navigationRepository.findAllWithChildren();
+      const query = `
+        WITH RECURSIVE navigation_tree AS (
+      -- Извлекаем корневые элементы
+      SELECT id, parent_id, title, slug, navigation_type, "order",
+            jsonb '[]' as children
+      FROM navigations
+      WHERE parent_id IS NULL
+
+      UNION ALL
+
+      -- Рекурсивно добавляем дочерние элементы, исключая 'detail'
+      SELECT n.id, n.parent_id, n.title, n.slug, n.navigation_type, n."order",
+            jsonb '[]' as children
+      FROM navigations n
+      INNER JOIN navigation_tree nt ON nt.id = n.parent_id
+      WHERE n.navigation_type != 'detail'
+    )
+
+    -- Собираем иерархию с помощью jsonb_agg
+    SELECT jsonb_agg(
+      jsonb_build_object(
+        'id', id,
+        'title', title,
+        'slug', slug,
+        'navigation_type', navigation_type,
+        'order', "order",
+        'children', (
+          SELECT jsonb_agg(c)
+          FROM navigation_tree c
+          WHERE c.parent_id = navigation_tree.id
+        )
+      )
+    ) AS tree
+    FROM navigation_tree
+    WHERE parent_id IS NULL;
+      `
+
+      const navigations = await this.sequelize.query(query, {
+        type: QueryTypes.SELECT,
+      })
+
       if (!navigations)
         throw new InternalServerErrorException(
           'Navigations could not be finded',
         );
 
-      return navigations;
+      return navigations[0]["tree"];
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Navigations could not be finded');

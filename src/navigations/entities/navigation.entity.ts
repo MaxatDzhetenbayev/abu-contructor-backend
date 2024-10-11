@@ -34,6 +34,7 @@ export class Navigation extends Model {
   widgets: Widget[];
 
   static async findAllWithChildren() {
+
     const navigations = await this.findAll({
       include: [
         {
@@ -42,11 +43,6 @@ export class Navigation extends Model {
           include: [{
             model: Navigation,
             as: 'children',
-            where: {
-              navigation_type: {
-                [sequelize.Op.ne]: "detail"
-              }
-            },
           }],
         },
       ],

@@ -36,6 +36,7 @@ import { NewsModule } from './news/news.module';
       database: process.env.DB,
       logging: false,
       models: [Navigation, Widget, Content, Template, Auth],
+
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -50,5 +51,6 @@ import { NewsModule } from './news/news.module';
     AuthModule,
     NewsModule,
   ],
+  exports: [SequelizeModule],
 })
 export class AppModule { }
