@@ -52,14 +52,16 @@ export class SearchService {
       // Добавление полного slug к найденным навигациям и виджетам
       const result = await Promise.all([
         ...navigations.map(async (navigation) => {
-          const slug = await this.getParentNavigationSlug(navigation.id);
+          const { slug, title } = await this.getParentNavigationSlug(navigation.id, locale);
           navigation.setDataValue('slug', slug.reverse().join('/'));
+          navigation.setDataValue('all_title', title.reverse().join('/'));
           navigation.setDataValue('type', 'navigation');
           return navigation;
         }),
         ...widgets.map(async (widget) => {
-          const slug = await this.getParentNavigationSlug(widget.navigation.id);
+          const { slug, title } = await this.getParentNavigationSlug(widget.navigation.id, locale);
           widget.navigation.setDataValue('slug', slug.reverse().join('/'));
+          widget.navigation.setDataValue('all_title', title.reverse().join('/'));
           widget.navigation.setDataValue('type', 'widget');
           return widget;
         }),
@@ -73,14 +75,16 @@ export class SearchService {
     }
   }
 
-  async getParentNavigationSlug(id: number) {
+  async getParentNavigationSlug(id: number, locale: string) {
 
     const slug: string[] = []
+    const title: string[] = []
 
     let navigation = await this.navigationModel.findByPk(id);
 
     while (navigation) {
       slug.push(navigation.slug);
+      title.push(navigation.title[locale]);
       if (navigation.parent_id) {
         navigation = await this.navigationModel.findByPk(navigation.parent_id);
       } else {
@@ -88,6 +92,6 @@ export class SearchService {
       }
     }
 
-    return slug;
+    return { slug, title };
   }
 }
