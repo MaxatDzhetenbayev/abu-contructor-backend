@@ -33,17 +33,28 @@ export class Navigation extends Model {
   @HasMany(() => Widget)
   widgets: Widget[];
 
-  static async findAllWithChildren() {
+  static createTree(navigations: Navigation[], parent_id = null) {
+    return navigations
+      .filter((navigation) => navigation.parent_id === parent_id)
+      .map((navigation) => ({
+        ...navigation,
+        children: this.createTree(navigations, navigation.id),
+      }))
+      .sort((a, b) => a.order - b.order);
+  }
 
+  static async findAllWithChildren() {
     const navigations = await this.findAll({
       include: [
         {
           model: Navigation,
           as: 'children',
-          include: [{
-            model: Navigation,
-            as: 'children',
-          }],
+          include: [
+            {
+              model: Navigation,
+              as: 'children',
+            },
+          ],
         },
       ],
       order: [['order', 'ASC']],
@@ -92,44 +103,53 @@ export class Navigation extends Model {
     let currentId: number | null = null;
     let foundPage: Navigation | null = null;
 
-    for (const slug of slugs) {
-      foundPage = await this.findOne({
-        where: {
-          slug: slug,
-          parent_id: currentId,
-        },
-      });
+    try {
+      for (const slug of slugs) {
+        foundPage = await this.findOne({
+          where: {
+            slug: slug,
+            parent_id: currentId,
+          },
+        });
 
-      if (!foundPage) {
-        return null;
+        if (!foundPage) {
+          return null;
+        }
+
+        currentId = foundPage.id;
       }
 
-      currentId = foundPage.id;
-    }
-
-    const currentpage = await this.findOne({
-      where: {
-        id: currentId,
-      },
-      include: [
-        {
-          model: Widget,
-          as: 'widgets',
-          include: [
-            {
-              model: Content,
-              as: 'contents',
-            },
-          ],
+      const currentpage = await this.findOne({
+        where: {
+          id: currentId,
         },
-      ],
-      order: [
-        [{ model: Widget, as: 'widgets' }, 'order', 'ASC'],
-        [{ model: Widget, as: 'widgets' }, { model: Content, as: 'contents' }, 'order', 'ASC'],
-      ],
-    });
+        include: [
+          {
+            model: Widget,
+            as: 'widgets',
+            include: [
+              {
+                model: Content,
+                as: 'contents',
+              },
+            ],
+          },
+        ],
+        order: [
+          [{ model: Widget, as: 'widgets' }, 'order', 'ASC'],
+          [
+            { model: Widget, as: 'widgets' },
+            { model: Content, as: 'contents' },
+            'order',
+            'ASC',
+          ],
+        ],
+      });
 
-    return currentpage;
+      return currentpage;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   static async recalculateOrder(
