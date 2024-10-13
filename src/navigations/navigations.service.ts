@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { QueryTypes } from 'sequelize'
+import { QueryTypes } from 'sequelize';
 import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
@@ -14,7 +14,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from 'src/widgets/entities/widget.entity';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 
-
 @Injectable()
 export class NavigationsService {
   private readonly logger = new Logger(NavigationsService.name);
@@ -22,9 +21,8 @@ export class NavigationsService {
   constructor(
     @InjectModel(Navigation)
     private navigationRepository: typeof Navigation,
-    private readonly sequelize: Sequelize
-  ) { }
-
+    private readonly sequelize: Sequelize,
+  ) {}
 
   async create(createNavigationDto: CreateNavigationDto) {
     this.logger.log('Создание навигации', { createNavigationDto });
@@ -56,52 +54,36 @@ export class NavigationsService {
   async findAll() {
     try {
       const query = `
-        WITH RECURSIVE navigation_tree AS (
-      -- Извлекаем корневые элементы
-      SELECT id, parent_id, title, slug, navigation_type, "order",
-            jsonb '[]' as children
-      FROM navigations
-      WHERE parent_id IS NULL
+		WITH RECURSIVE navigation_tree AS (
+		SELECT *, 1 as level 
+		FROM navigations
+		WHERE parent_id IS NULL
 
-      UNION ALL
+		UNION ALL
 
-      -- Рекурсивно добавляем дочерние элементы, исключая 'detail'
-      SELECT n.id, n.parent_id, n.title, n.slug, n.navigation_type, n."order",
-            jsonb '[]' as children
-      FROM navigations n
-      INNER JOIN navigation_tree nt ON nt.id = n.parent_id
-      WHERE n.navigation_type != 'detail'
-    )
+		SELECT n.*, nt.level + 1
+		FROM navigations n
+		INNER JOIN navigation_tree nt ON nt.id = n.parent_id
+		)
 
-    -- Собираем иерархию с помощью jsonb_agg
-    SELECT jsonb_agg(
-      jsonb_build_object(
-        'id', id,
-        'title', title,
-        'slug', slug,
-        'navigation_type', navigation_type,
-        'order', "order",
-        'children', (
-          SELECT jsonb_agg(c)
-          FROM navigation_tree c
-          WHERE c.parent_id = navigation_tree.id
-        )
-      )
-    ) AS tree
-    FROM navigation_tree
-    WHERE parent_id IS NULL;
-      `
+		select * from navigation_tree where navigation_type != 'detail'
+      `;
 
-      const navigations = await this.sequelize.query(query, {
+      const navigations: Navigation[] = await this.sequelize.query(query, {
         type: QueryTypes.SELECT,
-      })
+      });
 
       if (!navigations)
         throw new InternalServerErrorException(
           'Navigations could not be finded',
         );
 
-      return navigations[0]["tree"];
+      const tree_navigations = this.navigationRepository.createTree(
+        navigations,
+        null,
+      );
+
+      return tree_navigations;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('Navigations could not be finded');
@@ -147,16 +129,20 @@ export class NavigationsService {
   }
 
   async getNaivagtionCrumbs(slug: string, locale: string): Promise<string[]> {
-
     const slugs = slug.split(',');
     const crumbs = [];
 
     try {
-
       for (let i = 0; i < slugs.length; i++) {
-        const findedPage = await this.navigationRepository.findOneBySlug(slugs.slice(0, i + 1));
+        const findedPage = await this.navigationRepository.findOneBySlug(
+          slugs.slice(0, i + 1),
+        );
 
-        const sendData = { title: findedPage.title[locale], navigation_type: findedPage.navigation_type, slug: slugs.slice(0, i + 1).join('/') };
+        const sendData = {
+          title: findedPage.title[locale],
+          navigation_type: findedPage.navigation_type,
+          slug: slugs.slice(0, i + 1).join('/'),
+        };
 
         if (findedPage) {
           crumbs.push(sendData);
@@ -187,8 +173,12 @@ export class NavigationsService {
         const navigation = navigationEntities.find((nav) => nav.id === id);
 
         if (parent_id) {
-          const parentNavigation = await this.navigationRepository.findByPk(parent_id);
-          if (parentNavigation.navigation_type !== 'group' && parentNavigation.navigation_type !== 'group-link') {
+          const parentNavigation =
+            await this.navigationRepository.findByPk(parent_id);
+          if (
+            parentNavigation.navigation_type !== 'group' &&
+            parentNavigation.navigation_type !== 'group-link'
+          ) {
             throw new HttpException(
               'Cannot add child navigation to a non-group navigation',
               HttpStatus.BAD_REQUEST,
