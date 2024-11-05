@@ -14,13 +14,12 @@ import { Navigation } from './navigations/entities/navigation.entity';
 import { Widget } from './widgets/entities/widget.entity';
 import { Content } from './contents/entities/content.entity';
 import { Template } from './template/entities/template.entity';
-import { Auth } from './auth/entities/auth.entity';
 
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { NewsModule } from './news/news.module';
-
+import { User } from './auth/entities/user.entity';
 
 @Module({
   imports: [
@@ -35,8 +34,7 @@ import { NewsModule } from './news/news.module';
       password: process.env.DB_PASS,
       database: process.env.DB,
       logging: false,
-      models: [Navigation, Widget, Content, Template, Auth],
-
+      models: [Navigation, Widget, Content, Template, User],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -53,4 +51,4 @@ import { NewsModule } from './news/news.module';
   ],
   exports: [SequelizeModule],
 })
-export class AppModule { }
+export class AppModule {}

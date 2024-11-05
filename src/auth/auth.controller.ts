@@ -1,35 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { RegisterDto, LoginDto } from './dto/auth-dto';
+import { AuthGuard } from '@nestjs/passport';
+import { UserDto } from './dto/user-dto';
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('auth') // Тег для группировки
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateUserDto) {
-    return this.authService.createUser(createAuthDto);
+  @Post('register')
+  @ApiResponse({ status: 201, description: 'User registered successfully.' }) // Ответ на успешную регистрацию
+  @ApiResponse({ status: 400, description: 'Invalid data.' }) // Ответ на ошибку
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
-  @Get()
-  findAll() {
+  @Post('login')
+  @ApiResponse({ status: 200, description: 'Login successful.', type: String }) // Успешный ответ при логине
+  @ApiResponse({ status: 401, description: 'Invalid credentials.' }) // Ответ на ошибку логина
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('users')
+  @ApiBearerAuth() // Указывает, что требуется Bearer Token
+  @ApiResponse({ status: 200, description: 'List of users.', type: [UserDto] }) // Успешный ответ с пользователями
+  @ApiResponse({ status: 401, description: 'Unauthorized.' }) // Ответ на ошибку доступа
+  async getUsers(): Promise<UserDto[]> {
     return this.authService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  @UseGuards(AuthGuard('jwt'))
+  @Post('logout')
+  async logout(@Request() req) {
+    const token = req.headers.authorization.split(' ')[1]; // Получите токен из заголовка
+    return this.authService.logout(token);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Post('refresh')
+  async refresh(@Body() refreshDto: { refreshToken: string }) {
+    return this.authService.refreshAccessToken(refreshDto.refreshToken);
   }
 }
+
