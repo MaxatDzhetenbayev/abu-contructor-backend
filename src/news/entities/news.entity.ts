@@ -1,17 +1,22 @@
-import { Table, Column, Model } from 'sequelize-typescript';
+import { Table, Column, DataType, Model } from 'sequelize-typescript';
 
 
 @Table({ tableName: 'news', timestamps: true })
-export class News {
-    @Column
-    title: string;
+export class News extends Model<News> {
+    @Column({
+        type: DataType.JSONB,
+    })
+    title: {
+        [key: string]: any
+    };
+
+    @Column({
+        type: DataType.JSONB,
+    })
+    content: {
+        [key: string]: any
+    };
 
     @Column
-    content: string;
-
-
-    
-
-    @Column
-    images: string[];
+    viewCount: number
 }

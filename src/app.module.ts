@@ -15,11 +15,15 @@ import { Widget } from './widgets/entities/widget.entity';
 import { Content } from './contents/entities/content.entity';
 import { Template } from './template/entities/template.entity';
 import { Auth } from './auth/entities/auth.entity';
+import { CustomBlock } from './custom_blocks/entities/custom_block.entity';
 
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { NewsModule } from './news/news.module';
+import { CustomBlocksModule } from './custom_blocks/custom_blocks.module';
+import { News } from './news/entities/news.entity';
+import { EventsModule } from './events/events.module';
 
 
 @Module({
@@ -35,7 +39,7 @@ import { NewsModule } from './news/news.module';
       password: process.env.DB_PASS,
       database: process.env.DB,
       logging: false,
-      models: [Navigation, Widget, Content, Template, Auth],
+      models: [Navigation, Widget, Content, Template, Auth, CustomBlock, News],
 
     }),
     ServeStaticModule.forRoot({
@@ -50,6 +54,8 @@ import { NewsModule } from './news/news.module';
     FilesModule,
     AuthModule,
     NewsModule,
+    CustomBlocksModule,
+    EventsModule,
   ],
   exports: [SequelizeModule],
 })

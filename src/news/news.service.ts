@@ -1,26 +1,96 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { News } from './entities/news.entity';
 
 @Injectable()
 export class NewsService {
-  create(createNewsDto: CreateNewsDto) {
-    return 'This action adds a new news';
+  logger = new Logger('NewsService');
+
+  constructor(
+    @InjectModel(News)
+    private newsRepository: typeof News,
+  ) { }
+
+  async create(createNewsDto: CreateNewsDto) {
+    try {
+      const createdNews = await this.newsRepository.create(createNewsDto);
+
+      if (!createdNews)
+        throw new InternalServerErrorException('News could not be created');
+
+      return createdNews;
+    } catch (error) {
+      this.logger.error(error)
+      throw new InternalServerErrorException('News could not be created');
+    }
   }
 
-  findAll() {
-    return `This action returns all news`;
+  async findAll() {
+    try {
+      const findedNews = await this.newsRepository.findAll();
+
+      if (findedNews.length <= 0) {
+        throw new InternalServerErrorException('News could not be finded');
+      }
+
+      return findedNews;
+    } catch (error) {
+      this.logger.error(error)
+      throw new InternalServerErrorException('News could not be finded');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} news`;
+  async findOne(id: number) {
+    try {
+      const findedNews = await this.newsRepository.findByPk(id);
+
+      if (!findedNews) {
+        throw new InternalServerErrorException('News could not be finded');
+      }
+
+      return findedNews;
+    } catch (error) {
+      this.logger.error(error)
+      throw new InternalServerErrorException('News could not be finded');
+    }
   }
 
-  update(id: number, updateNewsDto: UpdateNewsDto) {
-    return `This action updates a #${id} news`;
+  async update(id: number, updateNewsDto: UpdateNewsDto) {
+    try {
+      const findedNews = await this.newsRepository.findByPk(id);
+
+      if (!findedNews) {
+        throw new InternalServerErrorException('News could not be updated');
+      }
+
+      await findedNews.update(updateNewsDto)
+
+      return findedNews;
+    } catch (error) {
+      this.logger.error(error)
+      throw new InternalServerErrorException('News could not be updated');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} news`;
+  async remove(id: number) {
+    try {
+      const findedNews = await this.newsRepository.findByPk(id);
+
+      if (!findedNews) {
+        throw new InternalServerErrorException(`News with ${id} could not be finded`);
+      }
+
+      await findedNews.destroy()
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Content deleted successfully',
+      };
+    } catch (error) {
+      this.logger.error(error)
+      throw new InternalServerErrorException('News could not be deleted');
+    }
   }
 }
