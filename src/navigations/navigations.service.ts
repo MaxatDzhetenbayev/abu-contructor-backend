@@ -13,6 +13,7 @@ import { Navigation } from './entities/navigation.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from 'src/widgets/entities/widget.entity';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
+import { Content } from 'src/contents/entities/content.entity';
 
 @Injectable()
 export class NavigationsService {
@@ -51,37 +52,39 @@ export class NavigationsService {
     }
   }
 
-  async findAll() {
+  async findAll(withContent: boolean) {
+    const options = withContent
+      ? {
+          include: [
+            {
+              model: Widget,
+              as: 'widgets',
+              include: [
+                {
+                  model: Content,
+                  as: 'contents',
+                },
+              ],
+            },
+          ],
+        }
+      : {};
+
     try {
-      const query = `
-		WITH RECURSIVE navigation_tree AS (
-		SELECT *, 1 as level 
-		FROM navigations
-		WHERE parent_id IS NULL
-
-		UNION ALL
-
-		SELECT n.*, nt.level + 1
-		FROM navigations n
-		INNER JOIN navigation_tree nt ON nt.id = n.parent_id
-		)
-
-		select * from navigation_tree where navigation_type != 'detail'
-      `;
-
-      const navigations: Navigation[] = await this.sequelize.query(query, {
-        type: QueryTypes.SELECT,
-      });
+      const navigations: Navigation[] =
+        await this.navigationRepository.findAll(options);
 
       if (!navigations)
         throw new InternalServerErrorException(
           'Navigations could not be finded',
         );
 
-      const tree_navigations = this.navigationRepository.createTree(
-        navigations,
-        null,
+      const plainNavigations = navigations.map((navigation) =>
+        navigation.get({ plain: true }),
       );
+
+      const tree_navigations =
+        this.navigationRepository.createTree(plainNavigations);
 
       return tree_navigations;
     } catch (error) {

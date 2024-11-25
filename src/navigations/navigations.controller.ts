@@ -23,7 +23,7 @@ interface UpdateNavigationOrderDtoNew {
 
 @Controller('navigations')
 export class NavigationsController {
-  constructor(private readonly navigationsService: NavigationsService) { }
+  constructor(private readonly navigationsService: NavigationsService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
@@ -33,8 +33,8 @@ export class NavigationsController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  findAll() {
-    return this.navigationsService.findAll();
+  findAll(@Query('content') withContent: string) {
+    return this.navigationsService.findAll(!!withContent);
   }
 
   @Get(':id')
@@ -51,7 +51,7 @@ export class NavigationsController {
   @HttpCode(HttpStatus.OK)
   @Get('get/crumbs')
   getCrumb(@Query('slug') slug: string, @Query('locale') locale: string) {
-    return this.navigationsService.getNaivagtionCrumbs(slug, locale)
+    return this.navigationsService.getNaivagtionCrumbs(slug, locale);
   }
 
   @Patch(':id')
@@ -67,8 +67,6 @@ export class NavigationsController {
   updateOrder(@Body() updateOrderDto: UpdateNavigationOrderDto[]) {
     return this.navigationsService.updateOrder(updateOrderDto);
   }
-
-
 
   @Delete(':id')
   remove(@Param('id') id: string) {

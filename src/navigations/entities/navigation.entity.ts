@@ -33,14 +33,34 @@ export class Navigation extends Model {
   @HasMany(() => Widget)
   widgets: Widget[];
 
-  static createTree(navigations: Navigation[], parent_id = null) {
-    return navigations
-      .filter((navigation) => navigation.parent_id === parent_id)
-      .map((navigation) => ({
-        ...navigation,
-        children: this.createTree(navigations, navigation.id),
-      }))
-      .sort((a, b) => a.order - b.order);
+  static createTree(navigations: Navigation[]) {
+    const map = new Map<number, any>(); // Карта для быстрого доступа к узлам
+    const roots: any[] = []; // Корневые узлы
+
+    // Создаем карту всех узлов
+    navigations.forEach((navigation) => {
+      map.set(navigation.id, { ...navigation, children: [] });
+    });
+
+    // Связываем узлы с их родителями
+    navigations.forEach((navigation) => {
+      const node = map.get(navigation.id);
+      if (navigation.parent_id) {
+        const parent = map.get(navigation.parent_id);
+        if (parent) {
+          parent.children.push(node);
+          // Сортируем детей на уровне родителя
+          parent.children.sort((a, b) => a.order - b.order);
+        }
+      } else {
+        roots.push(node); // Если родителя нет, это корневой узел
+      }
+    });
+
+    // Сортируем корневые узлы
+    roots.sort((a, b) => a.order - b.order);
+
+    return roots;
   }
 
   static async findAllWithChildren() {
