@@ -15,7 +15,10 @@ module.exports = {
       },
       title: sequelize.JSONB,
       content: sequelize.JSONB,
-      viewCount: sequelize.INTEGER,
+      viewCount: {
+        type: sequelize.INTEGER,
+        defaultValue: 0
+      },
       createdAt: {
         type: sequelize.DATE,
         defaultValue: sequelize.literal('NOW()'),
