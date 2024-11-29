@@ -5,7 +5,6 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { QueryTypes } from 'sequelize';
 import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
@@ -14,6 +13,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Widget } from 'src/widgets/entities/widget.entity';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 import { Content } from 'src/contents/entities/content.entity';
+import sequelize from 'sequelize';
 
 @Injectable()
 export class NavigationsService {
@@ -23,7 +23,7 @@ export class NavigationsService {
     @InjectModel(Navigation)
     private navigationRepository: typeof Navigation,
     private readonly sequelize: Sequelize,
-  ) {}
+  ) { }
 
   async create(createNavigationDto: CreateNavigationDto) {
     this.logger.log('Создание навигации', { createNavigationDto });
@@ -53,26 +53,29 @@ export class NavigationsService {
   }
 
   async findAll(withContent: boolean) {
-    const options = withContent
-      ? {
+    let options = withContent && {
+      include: [
+        {
+          model: Widget,
+          as: 'widgets',
           include: [
             {
-              model: Widget,
-              as: 'widgets',
-              include: [
-                {
-                  model: Content,
-                  as: 'contents',
-                },
-              ],
+              model: Content,
+              as: 'contents',
             },
           ],
-        }
-      : {};
+        },
+      ],
+    }
+
 
     try {
       const navigations: Navigation[] =
-        await this.navigationRepository.findAll(options);
+        await this.navigationRepository.findAll({
+          ...options, where: {
+            navigation_type: { [sequelize.Op.ne]: "detail" }
+          }
+        });
 
       if (!navigations)
         throw new InternalServerErrorException(
