@@ -107,7 +107,8 @@ export class ContentsService {
         const filePath = path.join(__dirname, 'uploads', image);
         fs.unlinkSync(filePath);
       }
-      // content.destroy();
+
+      findedItem.destroy();
 
       return {
         statusCode: HttpStatus.OK,
