@@ -3,15 +3,15 @@
     "username": "postgres",
     "password": "admin",
     "database": "abu",
-    "host": "localhost",
+    "host": "193.193.228.6",
     "dialect": "postgres"
   },
   "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "postgres",
+    "password": "admin",
+    "database": "abu",
+    "host": "100.100.2.3",
+    "dialect": "postgres"
   },
   "production": {
     "username": "root",
