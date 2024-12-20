@@ -50,6 +50,8 @@ export class NewsService {
         throw new InternalServerErrorException('News could not be finded');
       }
 
+      await findedNews.increment('viewCount', { by: 1 });
+
       return findedNews;
     } catch (error) {
       this.logger.error(error)
