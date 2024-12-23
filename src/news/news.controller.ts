@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
@@ -18,8 +18,8 @@ export class NewsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.newsService.findOne(+id);
+  findOne(@Param('id') id: string, @Query('direction') direction: 'prev' | 'next') {
+    return this.newsService.findOne(+id, direction);
   }
 
   @Patch(':id')

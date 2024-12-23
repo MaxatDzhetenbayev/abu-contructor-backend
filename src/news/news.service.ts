@@ -3,6 +3,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { News } from './entities/news.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class NewsService {
@@ -42,9 +43,21 @@ export class NewsService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, direction?: 'prev' | 'next') {
+
+    const where = {}
+
+    if (direction) {
+      where['id'] = {
+        [Op[direction === 'prev' ? 'lt' : 'gt']]: id
+      }
+    } else {
+      where['id'] = id
+    }
+
     try {
-      const findedNews = await this.newsRepository.findByPk(id);
+      const findedNews = await this.newsRepository.findOne({ where });
+
 
       if (!findedNews) {
         throw new InternalServerErrorException('News could not be finded');
@@ -58,6 +71,7 @@ export class NewsService {
       throw new InternalServerErrorException('News could not be finded');
     }
   }
+
 
   async update(id: number, updateNewsDto: UpdateNewsDto) {
     try {
