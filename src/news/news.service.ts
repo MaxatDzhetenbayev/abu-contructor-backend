@@ -42,7 +42,7 @@ export class NewsService {
     }
 
     try {
-      const findedNews = await this.newsRepository.findAll({
+      const { rows: findedNews, count } = await this.newsRepository.findAndCountAll({
         ...config,
       });
 
@@ -50,7 +50,7 @@ export class NewsService {
         throw new InternalServerErrorException('News could not be finded');
       }
 
-      return { items: findedNews, count: findedNews.length };
+      return { items: findedNews, count };
     } catch (error) {
       this.logger.error(error)
       throw new InternalServerErrorException('News could not be finded');
