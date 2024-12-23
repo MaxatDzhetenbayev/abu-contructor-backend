@@ -13,8 +13,8 @@ export class NewsController {
   }
 
   @Get()
-  findAll() {
-    return this.newsService.findAll();
+  findAll(@Query('limit') limit: number, @Query('offset') offset: number) {
+    return this.newsService.findAll(limit, offset);
   }
 
   @Get(':id')
