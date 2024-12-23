@@ -3,7 +3,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { News } from './entities/news.entity';
-import { Op } from 'sequelize';
+import { FindOptions, Op } from 'sequelize';
 
 @Injectable()
 export class NewsService {
@@ -28,9 +28,27 @@ export class NewsService {
     }
   }
 
-  async findAll() {
+  async findAll(limit?: number, offset?: number) {
+
+
+    const config: FindOptions<News> = {
+      order: [['id', 'ASC']],
+    }
+
+    if (limit) {
+      config['limit'] = limit
+    }
+
+    if (offset) {
+      config['offset'] = offset
+    }
+    console.log(offset)
+
+
     try {
-      const findedNews = await this.newsRepository.findAll();
+      const findedNews = await this.newsRepository.findAll({
+        ...config,
+      });
 
       if (findedNews.length <= 0) {
         throw new InternalServerErrorException('News could not be finded');
@@ -57,8 +75,6 @@ export class NewsService {
 
     try {
       const findedNews = await this.newsRepository.findOne({ where });
-
-
       if (!findedNews) {
         throw new InternalServerErrorException('News could not be finded');
       }
