@@ -29,8 +29,6 @@ export class NewsService {
   }
 
   async findAll(limit?: number, offset?: number) {
-
-
     const config: FindOptions<News> = {
       order: [['id', 'ASC']],
     }
@@ -42,8 +40,6 @@ export class NewsService {
     if (offset) {
       config['offset'] = offset
     }
-    console.log(offset)
-
 
     try {
       const findedNews = await this.newsRepository.findAll({
@@ -54,7 +50,7 @@ export class NewsService {
         throw new InternalServerErrorException('News could not be finded');
       }
 
-      return findedNews;
+      return { items: findedNews, count: findedNews.length };
     } catch (error) {
       this.logger.error(error)
       throw new InternalServerErrorException('News could not be finded');
