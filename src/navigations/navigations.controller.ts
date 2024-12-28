@@ -15,11 +15,11 @@ import { CreateNavigationDto } from './dto/create-navigation.dto';
 import { UpdateNavigationDto } from './dto/update-navigation.dto';
 import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 
-interface UpdateNavigationOrderDtoNew {
-  id: number;
-  target_id: number;
-  parent_id?: number | null;
-}
+// interface UpdateNavigationOrderDtoNew {
+//   id: number;
+//   target_id: number;
+//   parent_id?: number | null;
+// }
 
 @Controller('navigations')
 export class NavigationsController {

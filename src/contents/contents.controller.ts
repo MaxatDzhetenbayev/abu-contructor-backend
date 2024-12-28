@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
@@ -6,8 +16,7 @@ import { UpdateContentOrderDto } from './dto/update-content-order.dto';
 
 @Controller('contents')
 export class ContentsController {
-  constructor(private readonly contentsService: ContentsService) { }
-
+  constructor(private readonly contentsService: ContentsService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
@@ -21,9 +30,7 @@ export class ContentsController {
   }
 
   @Get('by-widget-id/:widget_id')
-  findAllByWidgetId(
-    @Param('widget_id') widget_id: string,
-  ) {
+  findAllByWidgetId(@Param('widget_id') widget_id: string) {
     return this.contentsService.findAllByWidgetId(+widget_id);
   }
 
@@ -45,7 +52,7 @@ export class ContentsController {
   @HttpCode(HttpStatus.OK)
   @Patch('orders/update')
   updateOrder(@Body() updateOrderDto: UpdateContentOrderDto[]) {
-    console.log(updateOrderDto)
+    console.log(updateOrderDto);
     return this.contentsService.updateOrder(updateOrderDto);
   }
 }

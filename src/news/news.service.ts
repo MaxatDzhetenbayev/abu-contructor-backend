@@ -1,4 +1,9 @@
-import { HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -11,7 +16,7 @@ export class NewsService {
   constructor(
     @InjectModel(News)
     private newsRepository: typeof News,
-  ) { }
+  ) {}
 
   async create(createNewsDto: CreateNewsDto) {
     try {
@@ -22,7 +27,7 @@ export class NewsService {
 
       return createdNews;
     } catch (error) {
-      this.logger.error(error)
+      this.logger.error(error);
       throw new InternalServerErrorException('News could not be created');
     }
   }
@@ -37,7 +42,7 @@ export class NewsService {
 
       return findedNews;
     } catch (error) {
-      this.logger.error(error)
+      this.logger.error(error);
       throw new InternalServerErrorException('News could not be finded');
     }
   }
@@ -52,7 +57,7 @@ export class NewsService {
 
       return findedNews;
     } catch (error) {
-      this.logger.error(error)
+      this.logger.error(error);
       throw new InternalServerErrorException('News could not be finded');
     }
   }
@@ -65,11 +70,11 @@ export class NewsService {
         throw new InternalServerErrorException('News could not be updated');
       }
 
-      await findedNews.update(updateNewsDto)
+      await findedNews.update(updateNewsDto);
 
       return findedNews;
     } catch (error) {
-      this.logger.error(error)
+      this.logger.error(error);
       throw new InternalServerErrorException('News could not be updated');
     }
   }
@@ -79,17 +84,19 @@ export class NewsService {
       const findedNews = await this.newsRepository.findByPk(id);
 
       if (!findedNews) {
-        throw new InternalServerErrorException(`News with ${id} could not be finded`);
+        throw new InternalServerErrorException(
+          `News with ${id} could not be finded`,
+        );
       }
 
-      await findedNews.destroy()
+      await findedNews.destroy();
 
       return {
         statusCode: HttpStatus.OK,
         message: 'Content deleted successfully',
       };
     } catch (error) {
-      this.logger.error(error)
+      this.logger.error(error);
       throw new InternalServerErrorException('News could not be deleted');
     }
   }

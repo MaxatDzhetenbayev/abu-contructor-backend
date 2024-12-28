@@ -13,14 +13,12 @@ export class SearchService {
   constructor(
     @InjectModel(Navigation) private navigationModel: typeof Navigation,
     @InjectModel(Widget) private widgetModel: typeof Widget,
-  ) { }
+  ) {}
 
   logger = new Logger('SearchService');
 
   async findByQueryString(query: string, locale: string) {
     try {
-
-
       const [navigations, widgets] = await Promise.all([
         // Поиск навигации по query параметру
         this.navigationModel.findAll({
@@ -35,8 +33,10 @@ export class SearchService {
         // Поиск виджетов по query параметру
         this.widgetModel.findAll({
           where: sequelize.where(
-            sequelize.literal(`LOWER(options->'content'->'${locale}'->>'title')`),
-            { [sequelize.Op.iLike]: `%${query.toLowerCase()}%` }
+            sequelize.literal(
+              `LOWER(options->'content'->'${locale}'->>'title')`,
+            ),
+            { [sequelize.Op.iLike]: `%${query.toLowerCase()}%` },
           ),
           attributes: ['options', 'order'],
           include: [
@@ -47,25 +47,34 @@ export class SearchService {
             },
           ],
         }),
-      ])
+      ]);
 
       // Добавление полного slug к найденным навигациям и виджетам
       const result = await Promise.all([
         ...navigations.map(async (navigation) => {
-          const { slug, title } = await this.getParentNavigationSlug(navigation.id, locale);
+          const { slug, title } = await this.getParentNavigationSlug(
+            navigation.id,
+            locale,
+          );
           navigation.setDataValue('slug', slug.reverse().join('/'));
           navigation.setDataValue('all_title', title.reverse().join('/'));
           navigation.setDataValue('type', 'navigation');
           return navigation;
         }),
         ...widgets.map(async (widget) => {
-          const { slug, title } = await this.getParentNavigationSlug(widget.navigation.id, locale);
+          const { slug, title } = await this.getParentNavigationSlug(
+            widget.navigation.id,
+            locale,
+          );
           widget.navigation.setDataValue('slug', slug.reverse().join('/'));
-          widget.navigation.setDataValue('all_title', title.reverse().join('/'));
+          widget.navigation.setDataValue(
+            'all_title',
+            title.reverse().join('/'),
+          );
           widget.navigation.setDataValue('type', 'widget');
           return widget;
         }),
-      ])
+      ]);
 
       return result;
       // return [...navigations, ...widgets];
@@ -76,9 +85,8 @@ export class SearchService {
   }
 
   async getParentNavigationSlug(id: number, locale: string) {
-
-    const slug: string[] = []
-    const title: string[] = []
+    const slug: string[] = [];
+    const title: string[] = [];
 
     let navigation = await this.navigationModel.findByPk(id);
 

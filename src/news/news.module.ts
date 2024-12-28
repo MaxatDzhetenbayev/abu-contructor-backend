@@ -9,4 +9,4 @@ import { News } from './entities/news.entity';
   controllers: [NewsController],
   providers: [NewsService],
 })
-export class NewsModule { }
+export class NewsModule {}

@@ -1,4 +1,9 @@
-import { HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -9,22 +14,24 @@ import * as fs from 'fs';
 import path from 'path';
 @Injectable()
 export class ContentsService {
-
   logger = new Logger('ContentsService');
 
   constructor(
     @InjectModel(Content)
     private contentRepository: typeof Content,
     private widgetsService: WidgetsService,
-  ) { }
+  ) {}
 
   async create(createContentDto: CreateContentDto) {
     try {
-
-      const widget = await this.widgetsService.findOneWithContents(createContentDto.widget_id);
-      console.log(widget)
-      const createdContent =
-        await this.contentRepository.create({ ...createContentDto, order: widget.contents.length + 1 });
+      const widget = await this.widgetsService.findOneWithContents(
+        createContentDto.widget_id,
+      );
+      console.log(widget);
+      const createdContent = await this.contentRepository.create({
+        ...createContentDto,
+        order: widget.contents.length + 1,
+      });
 
       if (!createdContent)
         throw new InternalServerErrorException('Content could not be created');
@@ -59,7 +66,6 @@ export class ContentsService {
 
   async findOne(id: number) {
     try {
-
       const content = await this.contentRepository.findByPk(id);
 
       if (!content)
@@ -67,13 +73,15 @@ export class ContentsService {
 
       return content;
     } catch (error) {
-      this.logger.error(`Content with id: ${id} could not be finded. Error: ${error}`);
+      this.logger.error(
+        `Content with id: ${id} could not be finded. Error: ${error}`,
+      );
       throw new InternalServerErrorException('Content could not be finded');
     }
   }
 
   async update(id: number, updateContentDto: UpdateContentDto) {
-    this.logger.log(`Updating content with id: ${id}`,);
+    this.logger.log(`Updating content with id: ${id}`);
     try {
       const content = await this.contentRepository.findByPk(id);
 
@@ -86,24 +94,23 @@ export class ContentsService {
       });
       this.logger.log(`Content with id: ${id} updated`);
     } catch (error) {
-
-      this.logger.error(`Content with id: ${id} could not be updated, error: ${error}`);
+      this.logger.error(
+        `Content with id: ${id} could not be updated, error: ${error}`,
+      );
       throw new InternalServerErrorException('Content could not be updated');
     }
   }
 
   async remove(id: number) {
     try {
-
       const findedItem = await this.contentRepository.findByPk(id);
       if (!findedItem)
         throw new InternalServerErrorException('Content could not be finded');
 
-
-      const { content } = findedItem
+      const { content } = findedItem;
 
       if (content && content.image) {
-        const image = content.image as string;
+        const image = content.image as unknown as string;
         const filePath = path.join(__dirname, 'uploads', image);
         fs.unlinkSync(filePath);
       }
@@ -115,12 +122,12 @@ export class ContentsService {
         message: 'Content deleted successfully',
       };
     } catch (error) {
-      this.logger.error(`Content with id: ${id} could not be deleted, error: ${error} `);
+      this.logger.error(
+        `Content with id: ${id} could not be deleted, error: ${error} `,
+      );
       throw new InternalServerErrorException('Content could not be deleted');
     }
   }
-
-
 
   async updateOrder(widgetOrders: UpdateContentOrderDto[]) {
     const transaction = await this.contentRepository.sequelize.transaction();

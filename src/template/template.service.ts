@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateOrderDto } from './dto/update-template-order.dto';
 import { Template } from './entities/template.entity';
@@ -6,18 +10,18 @@ import { InjectModel } from '@nestjs/sequelize';
 
 @Injectable()
 export class TemplateService {
-
   logger = new Logger('TemplateService');
 
   constructor(
     @InjectModel(Template)
     private templateRepository: typeof Template,
-  ) { }
+  ) {}
 
   async create(createTemplateDto: CreateTemplateDto) {
     try {
       this.logger.log('Создание нового шаблона', { createTemplateDto });
-      const createdTemplate = await this.templateRepository.create(createTemplateDto);
+      const createdTemplate =
+        await this.templateRepository.create(createTemplateDto);
 
       if (!createdTemplate) {
         throw new Error('Template not created');
@@ -25,12 +29,9 @@ export class TemplateService {
 
       this.logger.log(`Теплейт с id: ${createdTemplate.id} создан успешно`);
       return createdTemplate;
-
     } catch (error) {
-
       console.log(error);
       throw new InternalServerErrorException('Templte could not be created');
-
     }
   }
 
@@ -38,8 +39,8 @@ export class TemplateService {
     try {
       const template = await this.templateRepository.findOne({
         where: {
-          title: title
-        }
+          title: title,
+        },
       });
 
       if (!template) {
@@ -53,7 +54,6 @@ export class TemplateService {
     }
   }
   async findAll() {
-
     try {
       const templates = await this.templateRepository.findAll();
 
@@ -76,20 +76,18 @@ export class TemplateService {
     this.logger.log('Обновление порядка шаблонов', { updateTemplateDto });
 
     try {
-
       const templateEntities = await this.templateRepository.findAll();
 
-      const draggedEntity = templateEntities.find((template) => template.id === id);
+      const draggedEntity = templateEntities.find(
+        (template) => template.id === id,
+      );
 
       if (!draggedEntity) {
         throw new InternalServerErrorException('Template could not be found');
       }
-
     } catch (error) {
-
       console.log(error);
       throw new InternalServerErrorException('Templte could not be updated');
-
     }
   }
 

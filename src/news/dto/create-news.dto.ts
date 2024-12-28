@@ -1,12 +1,12 @@
-import { IsObject } from "class-validator"
+import { IsObject } from 'class-validator';
 
 export class CreateNewsDto {
-    @IsObject()
-    title: {
-        [key: string]: any
-    }
-    @IsObject()
-    content: {
-        [key: string]: any
-    }
+  @IsObject()
+  title: {
+    [key: string]: any;
+  };
+  @IsObject()
+  content: {
+    [key: string]: any;
+  };
 }
