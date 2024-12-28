@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
@@ -21,13 +22,16 @@ export class NewsController {
   }
 
   @Get()
-  findAll() {
-    return this.newsService.findAll();
+  findAll(@Query('limit') limit: number, @Query('offset') offset: number) {
+    return this.newsService.findAll(limit, offset);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.newsService.findOne(+id);
+  findOne(
+    @Param('id') id: string,
+    @Query('direction') direction: 'prev' | 'next',
+  ) {
+    return this.newsService.findOne(+id, direction);
   }
 
   @Patch(':id')

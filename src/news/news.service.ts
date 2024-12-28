@@ -8,6 +8,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { News } from './entities/news.entity';
+import { FindOptions, Op } from 'sequelize';
 
 @Injectable()
 export class NewsService {
@@ -32,35 +33,62 @@ export class NewsService {
     }
   }
 
-  async findAll() {
+  async findAll(limit?: number, offset?: number) {
+    const config: FindOptions<News> = {
+      order: [['id', 'ASC']],
+    }
+
+    if (limit) {
+      config['limit'] = limit
+    }
+
+    if (offset) {
+      config['offset'] = offset
+    }
+
     try {
-      const findedNews = await this.newsRepository.findAll();
+      const findedNews = await this.newsRepository.findAll({
+        ...config,
+      });
 
       if (findedNews.length <= 0) {
         throw new InternalServerErrorException('News could not be finded');
       }
 
-      return findedNews;
+      return { items: findedNews, count: findedNews.length };
     } catch (error) {
       this.logger.error(error);
       throw new InternalServerErrorException('News could not be finded');
     }
   }
 
-  async findOne(id: number) {
-    try {
-      const findedNews = await this.newsRepository.findByPk(id);
+  async findOne(id: number, direction?: 'prev' | 'next') {
 
+    const where = {}
+
+    if (direction) {
+      where['id'] = {
+        [Op[direction === 'prev' ? 'lt' : 'gt']]: id
+      }
+    } else {
+      where['id'] = id
+    }
+
+    try {
+      const findedNews = await this.newsRepository.findOne({ where });
       if (!findedNews) {
         throw new InternalServerErrorException('News could not be finded');
       }
 
+      await findedNews.increment('viewCount', { by: 1 });
+
       return findedNews;
     } catch (error) {
       this.logger.error(error);
       throw new InternalServerErrorException('News could not be finded');
     }
   }
+
 
   async update(id: number, updateNewsDto: UpdateNewsDto) {
     try {
