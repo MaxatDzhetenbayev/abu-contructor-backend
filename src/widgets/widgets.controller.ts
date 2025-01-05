@@ -16,7 +16,7 @@ import { UpdateWidgetOrderDto } from './dto/update-widget-order';
 
 @Controller('widgets')
 export class WidgetsController {
-  constructor(private readonly widgetsService: WidgetsService) { }
+  constructor(private readonly widgetsService: WidgetsService) {}
 
   @Post()
   create(@Body() createWidgetDto: CreateWidgetDto) {
@@ -42,8 +42,6 @@ export class WidgetsController {
   update(@Param('id') id: string, @Body() updateWidgetDto: UpdateWidgetDto) {
     return this.widgetsService.update(+id, updateWidgetDto);
   }
-
-
 
   @HttpCode(HttpStatus.OK)
   @Patch('orders/update')

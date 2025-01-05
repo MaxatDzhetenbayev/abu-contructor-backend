@@ -18,7 +18,7 @@ export class Content extends Model<Content> {
     allowNull: false,
   })
   content: {
-    [key: string]: Object;
+    [key: string]: object;
   };
 
   @Column({
