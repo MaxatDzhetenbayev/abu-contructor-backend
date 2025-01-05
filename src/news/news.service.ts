@@ -36,20 +36,21 @@ export class NewsService {
   async findAll(limit?: number, offset?: number) {
     const config: FindOptions<News> = {
       order: [['id', 'ASC']],
-    }
+    };
 
     if (limit) {
-      config['limit'] = limit
+      config['limit'] = limit;
     }
 
     if (offset) {
-      config['offset'] = offset
+      config['offset'] = offset;
     }
 
     try {
-      const { rows: findedNews, count } = await this.newsRepository.findAndCountAll({
-        ...config,
-      });
+      const { rows: findedNews, count } =
+        await this.newsRepository.findAndCountAll({
+          ...config,
+        });
 
       if (findedNews.length <= 0) {
         throw new InternalServerErrorException('News could not be finded');
@@ -63,15 +64,14 @@ export class NewsService {
   }
 
   async findOne(id: number, direction?: 'prev' | 'next') {
-
-    const where = {}
+    const where = {};
 
     if (direction) {
       where['id'] = {
-        [Op[direction === 'prev' ? 'lt' : 'gt']]: id
-      }
+        [Op[direction === 'prev' ? 'lt' : 'gt']]: id,
+      };
     } else {
-      where['id'] = id
+      where['id'] = id;
     }
 
     try {
@@ -88,7 +88,6 @@ export class NewsService {
       throw new InternalServerErrorException('News could not be finded');
     }
   }
-
 
   async update(id: number, updateNewsDto: UpdateNewsDto) {
     try {

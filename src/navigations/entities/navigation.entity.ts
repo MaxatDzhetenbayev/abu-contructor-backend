@@ -15,7 +15,7 @@ export class Navigation extends Model {
   slug: string;
 
   @Column
-  variant: string
+  variant: string;
 
   @Column
   navigation_type: string;

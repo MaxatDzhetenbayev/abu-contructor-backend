@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 const bcrypt = require('bcrypt');
 require('dotenv').config();
