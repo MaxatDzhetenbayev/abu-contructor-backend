@@ -11,7 +11,7 @@ import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -23,7 +23,7 @@ export class AuthController {
 
     response
       .cookie('accessToken', accessToken, {
-        // httpOnly: true,
+        httpOnly: true,
         secure: true,
         sameSite: 'strict',
       })
@@ -34,9 +34,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   logout(@Res() res: Response) {
-    // Удаление куков
     res.clearCookie('accessToken', {
-      // httpOnly: true,
+      httpOnly: true,
       secure: true,
       sameSite: 'strict',
       path: '/',
