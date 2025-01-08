@@ -23,7 +23,7 @@ export class AuthController {
 
     response
       .cookie('accessToken', accessToken, {
-        httpOnly: true,
+        // httpOnly: true,
         secure: true,
         sameSite: 'strict',
       })
@@ -36,7 +36,7 @@ export class AuthController {
   logout(@Res() res: Response) {
     // Удаление куков
     res.clearCookie('accessToken', {
-      httpOnly: true,
+      // httpOnly: true,
       secure: true,
       sameSite: 'strict',
       path: '/',
