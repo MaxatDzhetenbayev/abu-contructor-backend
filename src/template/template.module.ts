@@ -5,10 +5,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Template } from './entities/template.entity';
 
 @Module({
-  imports: [
-    SequelizeModule.forFeature([Template]),
-  ],
+  imports: [SequelizeModule.forFeature([Template])],
   controllers: [TemplateController],
   providers: [TemplateService],
 })
-export class TemplateModule { }
+export class TemplateModule {}

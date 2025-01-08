@@ -1,4 +1,3 @@
-import sequelize from 'sequelize';
 import { DataTypes, Transaction } from 'sequelize';
 import { BelongsTo, Column, HasMany, Model, Table } from 'sequelize-typescript';
 import { Content } from 'src/contents/entities/content.entity';
@@ -16,7 +15,7 @@ export class Navigation extends Model {
   slug: string;
 
   @Column
-  variant: string
+  variant: string;
 
   @Column
   navigation_type: string;

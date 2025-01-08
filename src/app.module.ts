@@ -25,7 +25,6 @@ import { CustomBlocksModule } from './custom_blocks/custom_blocks.module';
 import { News } from './news/entities/news.entity';
 import { EventsModule } from './events/events.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -40,7 +39,6 @@ import { EventsModule } from './events/events.module';
       database: process.env.DB,
       logging: false,
       models: [Navigation, Widget, Content, Template, Auth, CustomBlock, News],
-
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -59,4 +57,4 @@ import { EventsModule } from './events/events.module';
   ],
   exports: [SequelizeModule],
 })
-export class AppModule { }
+export class AppModule {}

@@ -3,7 +3,7 @@ import { IsNumber, IsObject } from 'class-validator';
 export class CreateContentDto {
   @IsObject()
   content: {
-    [key: string]: Object;
+    [key: string]: object;
   };
 
   @IsObject()

@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join, resolve, } from 'path';
-import * as fs from 'fs'
+import { extname, join, resolve } from 'path';
+import * as fs from 'fs';
 @Controller('upload')
 export class FilesController {
   @Post()

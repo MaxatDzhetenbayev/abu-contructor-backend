@@ -1,44 +1,37 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Auth } from './entities/auth.entity';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     @InjectModel(Auth)
     private authRepository: typeof Auth,
-  ) { }
+    private jwtService: JwtService,
+  ) {}
 
-  createUser(createAuthDto: CreateAuthDto) {
-
-    try {
-      const createdAuth = this.authRepository.create(createAuthDto);
-
-      if (!createdAuth)
-        throw new Error('Auth could not be created');
-
-      return createdAuth;
-    } catch (error) {
-      console.log(error);
+  async validateAdmin(username: string, password: string) {
+    const user = await this.authRepository.findOne({
+      where: { username },
+    });
+    if (!user || user.role !== 'admin') {
+      throw new UnauthorizedException('Invalid credentials or not an admin');
     }
+
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return user;
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login(admin: Auth) {
+    const payload = { sub: admin.id, role: admin.role };
+    const accessToken = this.jwtService.sign(payload);
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    return { accessToken };
   }
 }

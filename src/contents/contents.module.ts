@@ -10,4 +10,4 @@ import { WidgetsModule } from 'src/widgets/widgets.module';
   controllers: [ContentsController],
   providers: [ContentsService],
 })
-export class ContentsModule { }
+export class ContentsModule {}

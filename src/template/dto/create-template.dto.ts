@@ -1,11 +1,8 @@
-import {
-    IsArray,
-    IsString
-} from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 
 export class CreateTemplateDto {
-    @IsString()
-    title: string;
-    @IsArray()
-    widgets: string[];
+  @IsString()
+  title: string;
+  @IsArray()
+  widgets: string[];
 }

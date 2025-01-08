@@ -6,9 +6,12 @@ import { Navigation } from './entities/navigation.entity';
 import { AppModule } from 'src/app.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Navigation]), forwardRef(() => AppModule)],
+  imports: [
+    SequelizeModule.forFeature([Navigation]),
+    forwardRef(() => AppModule),
+  ],
   controllers: [NavigationsController],
   providers: [NavigationsService],
   exports: [NavigationsService],
 })
-export class NavigationsModule { }
+export class NavigationsModule {}
