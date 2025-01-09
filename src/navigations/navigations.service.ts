@@ -23,7 +23,7 @@ export class NavigationsService {
     @InjectModel(Navigation)
     private navigationRepository: typeof Navigation,
     private readonly sequelize: Sequelize,
-  ) { }
+  ) {}
 
   async create(createNavigationDto: CreateNavigationDto) {
     this.logger.log('Создание навигации', { createNavigationDto });
@@ -53,7 +53,7 @@ export class NavigationsService {
   }
 
   async findAll(withContent: boolean) {
-    let options = withContent && {
+    const options = withContent && {
       include: [
         {
           model: Widget,
@@ -66,16 +66,17 @@ export class NavigationsService {
           ],
         },
       ],
-    }
-
+    };
 
     try {
-      const navigations: Navigation[] =
-        await this.navigationRepository.findAll({
-          ...options, where: {
-            navigation_type: { [sequelize.Op.ne]: "detail" }
-          }
-        });
+      const navigations: Navigation[] = await this.navigationRepository.findAll(
+        {
+          ...options,
+          where: {
+            navigation_type: { [sequelize.Op.ne]: 'detail' },
+          },
+        },
+      );
 
       if (!navigations)
         throw new InternalServerErrorException(

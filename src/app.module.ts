@@ -24,6 +24,7 @@ import { NewsModule } from './news/news.module';
 import { CustomBlocksModule } from './custom_blocks/custom_blocks.module';
 import { News } from './news/entities/news.entity';
 import { EventsModule } from './events/events.module';
+
 import { SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';

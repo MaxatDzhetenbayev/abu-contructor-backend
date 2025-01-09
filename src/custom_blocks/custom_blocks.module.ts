@@ -9,4 +9,4 @@ import { CustomBlock } from './entities/custom_block.entity';
   controllers: [CustomBlocksController],
   providers: [CustomBlocksService],
 })
-export class CustomBlocksModule { }
+export class CustomBlocksModule {}

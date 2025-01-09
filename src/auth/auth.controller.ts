@@ -1,35 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @Post()
-  create(@Body() createAuthDto: CreateUserDto) {
-    return this.authService.createUser(createAuthDto);
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  async login(@Body() body: any, @Res() response: Response) {
+    const { username, password } = body;
+    const admin = await this.authService.validateAdmin(username, password);
+
+    const { accessToken } = await this.authService.login(admin);
+
+    response
+      .cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+      })
+
+      .json({ message: 'Login successful' });
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  logout(@Res() res: Response) {
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+    });
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+    return res.json({ message: 'Logout successful' });
   }
 }

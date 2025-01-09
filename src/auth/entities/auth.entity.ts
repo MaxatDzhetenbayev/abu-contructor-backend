@@ -1,18 +1,25 @@
-import { Table, Model, Column } from "sequelize-typescript";
+import { Table, Model, Column, DataType } from 'sequelize-typescript';
 
 @Table({
-    tableName: 'auth',
+  tableName: 'auth',
 })
 export class Auth extends Model<Auth> {
-    @Column
-    login: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+  })
+  username: string;
 
-    @Column
-    password: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  password: string;
 
-    @Column
-    role: string;
-
-    @Column
-    token: string | null;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  role: string; // 'admin' или 'user'
 }

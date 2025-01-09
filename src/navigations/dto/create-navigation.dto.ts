@@ -1,10 +1,4 @@
-import {
-  isNumber,
-  IsNumber,
-  IsObject,
-  IsString,
-  ValidateIf,
-} from 'class-validator';
+import { isNumber, IsObject, IsString, ValidateIf } from 'class-validator';
 
 function IsNumberOrNull() {
   return ValidateIf((object, value) => value === null || isNumber(value));

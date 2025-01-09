@@ -1,8 +1,8 @@
-import { IsNumber } from "class-validator";
+import { IsNumber } from 'class-validator';
 
 export class UpdateContentOrderDto {
-    @IsNumber()
-    order: number;
-    @IsNumber()
-    id: number;
+  @IsNumber()
+  order: number;
+  @IsNumber()
+  id: number;
 }
