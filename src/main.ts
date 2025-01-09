@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import './sentry.config';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
@@ -18,7 +19,9 @@ async function bootstrap() {
     origin: configService.get<string>('FRONTEND_URL'),
     credentials: true,
   });
+  
   app.setGlobalPrefix('api');
   await app.listen(3003);
 }
+
 bootstrap();
