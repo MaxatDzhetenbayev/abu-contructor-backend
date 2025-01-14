@@ -23,7 +23,7 @@ import { UpdateNavigationOrderDto } from './dto/update-navigation-order';
 
 @Controller('navigations')
 export class NavigationsController {
-  constructor(private readonly navigationsService: NavigationsService) {}
+  constructor(private readonly navigationsService: NavigationsService) { }
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
