@@ -1,4 +1,5 @@
 import {
+  HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
@@ -43,8 +44,14 @@ export class ContentsService {
     }
   }
 
-  findAll() {
-    return `This action returns all contents`;
+  async findAll() {
+    try {
+      const contents = await this.contentRepository.findAll();
+      return contents;
+    } catch (error) {
+      this.logger.error(`Contents could not be finded`);
+      throw new InternalServerErrorException('Contents could not be finded');
+    }
   }
 
   async findAllByWidgetId(widget_id: number) {
@@ -104,27 +111,28 @@ export class ContentsService {
   async remove(id: number) {
     try {
       const findedItem = await this.contentRepository.findByPk(id);
+
       if (!findedItem)
         throw new InternalServerErrorException('Content could not be finded');
 
-      const { content } = findedItem;
+      await findedItem.destroy();
 
-      if (content && content.image) {
-        const image = content.image as unknown as string;
-        const filePath = path.join(__dirname, 'uploads', image);
-        fs.unlinkSync(filePath);
+      if (!findedItem) {
+        throw new InternalServerErrorException('Content could not be deleted');
       }
 
-      findedItem.destroy();
-
       return {
-        statusCode: HttpStatus.OK,
         message: 'Content deleted successfully',
       };
     } catch (error) {
       this.logger.error(
         `Content with id: ${id} could not be deleted, error: ${error} `,
       );
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException('Content could not be deleted');
     }
   }

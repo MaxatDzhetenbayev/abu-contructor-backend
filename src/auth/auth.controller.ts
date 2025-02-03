@@ -15,28 +15,23 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() body: any, @Res() response: Response) {
+  async login(@Body() body: any) {
     const { username, password } = body;
     const admin = await this.authService.validateAdmin(username, password);
 
     const { accessToken } = await this.authService.login(admin);
 
-    response
-      .cookie('accessToken', accessToken, {
-        // httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-      })
-
-      .json({ message: 'Login successful' });
+    return {
+      message: 'Login successful',
+      token: accessToken,
+    };
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   logout(@Res() res: Response) {
-    // Удаление куков
     res.clearCookie('accessToken', {
-      // httpOnly: true,
+      httpOnly: true,
       secure: true,
       sameSite: 'strict',
       path: '/',
