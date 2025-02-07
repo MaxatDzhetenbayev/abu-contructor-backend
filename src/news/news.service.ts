@@ -19,8 +19,19 @@ export class NewsService {
     private newsRepository: typeof News,
   ) {}
 
-  async create(createNewsDto: CreateNewsDto) {
+  async create(
+    createNewsDto: CreateNewsDto,
+    files: { [key: string]: Express.Multer.File[] },
+  ) {
     try {
+      const normalFiles = { ...files };
+
+      for (const lang_files in normalFiles) {
+        createNewsDto.content[lang_files].images = normalFiles[lang_files].map(
+          (file) => file.filename,
+        );
+      }
+
       const createdNews = await this.newsRepository.create(createNewsDto);
 
       if (!createdNews)
@@ -53,7 +64,7 @@ export class NewsService {
         });
 
       if (findedNews.length <= 0) {
-        throw new InternalServerErrorException('News could not be finded');
+        return [];
       }
 
       return { items: findedNews, count };

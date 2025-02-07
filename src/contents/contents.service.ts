@@ -11,8 +11,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Content } from './entities/content.entity';
 import { UpdateContentOrderDto } from './dto/update-content-order.dto';
 import { WidgetsService } from 'src/widgets/widgets.service';
-import * as fs from 'fs';
-import path from 'path';
 @Injectable()
 export class ContentsService {
   logger = new Logger('ContentsService');
