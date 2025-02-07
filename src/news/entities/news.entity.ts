@@ -16,6 +16,6 @@ export class News extends Model<News> {
     [key: string]: any;
   };
 
-  @Column
+  @Column({ defaultValue: 0 })
   viewCount: number;
 }
