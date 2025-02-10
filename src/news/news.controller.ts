@@ -9,13 +9,14 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  BadRequestException,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
-// import { CreateNewsDto } from './dto/create-news.dto'; @Body() createNewsDto: CreateNewsDto
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { FindQueriesDto } from './dto/find-queries.dto';
 
 @Controller('news')
 export class NewsController {
@@ -35,29 +36,46 @@ export class NewsController {
           filename: (req, file, callback) => {
             const uniqueSuffix =
               Date.now() + '-' + Math.round(Math.random() * 1e9);
-            const ext = extname(file.originalname);
-            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+            const ext = extname(file.originalname) || '.jpg';
+            const fieldName = file.fieldname;
+            callback(null, `${fieldName}_${uniqueSuffix}${ext}`);
           },
         }),
         fileFilter: (req, file, callback) => {
           if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
-            return callback(new Error('Only image files are allowed!'), false);
+            return callback(
+              new BadRequestException('Only image files are allowed!'),
+              false,
+            );
           }
           callback(null, true);
+        },
+        limits: {
+          fileSize: 10 * 1024 * 1024,
         },
       },
     ),
   )
-  create(@UploadedFiles() files, @Body() createNewsDto: any) {
-    console.log('files: ' + files, 'createNewsDto: ' + createNewsDto);
-    return files;
-
-    // return this.newsService.create(createNewsDto);
+  create(
+    @UploadedFiles()
+    files: {
+      kz: Express.Multer.File[];
+      ru: Express.Multer.File[];
+      en: Express.Multer.File[];
+    },
+    @Body('data') createNewsDto: any,
+  ) {
+    try {
+      const parsedDTO = JSON.parse(createNewsDto);
+      return this.newsService.create(parsedDTO, files);
+    } catch (error) {
+      return error;
+    }
   }
 
   @Get()
-  findAll(@Query('limit') limit: number, @Query('offset') offset: number) {
-    return this.newsService.findAll(limit, offset);
+  findAll(@Query() query: FindQueriesDto) {
+    return this.newsService.findAll(query);
   }
 
   @Get(':id')

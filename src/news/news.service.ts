@@ -8,7 +8,10 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { News } from './entities/news.entity';
-import { FindOptions, Op } from 'sequelize';
+import sequelize, { FindOptions, Op } from 'sequelize';
+import * as path from 'path';
+import * as fs from 'fs';
+import { FindQueriesDto } from './dto/find-queries.dto';
 
 @Injectable()
 export class NewsService {
@@ -19,8 +22,19 @@ export class NewsService {
     private newsRepository: typeof News,
   ) {}
 
-  async create(createNewsDto: CreateNewsDto) {
+  async create(
+    createNewsDto: CreateNewsDto,
+    files: { [key: string]: Express.Multer.File[] },
+  ) {
     try {
+      const normalFiles = { ...files };
+
+      for (const lang_files in normalFiles) {
+        createNewsDto.content[lang_files].images = normalFiles[lang_files].map(
+          (file) => file.filename,
+        );
+      }
+
       const createdNews = await this.newsRepository.create(createNewsDto);
 
       if (!createdNews)
@@ -33,17 +47,55 @@ export class NewsService {
     }
   }
 
-  async findAll(limit?: number, offset?: number) {
+  async findAll(queries: FindQueriesDto) {
+    const { offset, query, limit, startDate, endDate } = queries;
     const config: FindOptions<News> = {
-      order: [['id', 'ASC']],
+      order: [['id', 'DESC']],
     };
 
-    if (limit) {
-      config['limit'] = limit;
-    }
+    if (limit) config.limit = limit;
+    if (offset) config.offset = offset;
+    if (query)
+      config.where = {
+        ...config.where,
+        [Op.or]: [
+          {
+            title_vector: {
+              [Op.match]: sequelize.literal(
+                `to_tsquery('simple', '${query}:*')`,
+              ),
+            },
+          },
+          {
+            description_vector: {
+              [Op.match]: sequelize.literal(
+                `to_tsquery('simple', '${query}:*')`,
+              ),
+            },
+          },
+        ],
+      };
 
-    if (offset) {
-      config['offset'] = offset;
+    if (startDate && !endDate) {
+      const date = new Date(startDate).toISOString();
+      const startOfDay = new Date(date).setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date).setHours(23, 59, 59, 999);
+
+      config.where = {
+        ...config.where,
+        createdAt: {
+          [Op.between]: [startOfDay, endOfDay],
+        },
+      };
+    } else if (startDate && endDate) {
+      const endOfDayDate = new Date(endDate).setHours(23, 59, 59, 999);
+
+      config.where = {
+        ...config.where,
+        createdAt: {
+          [Op.between]: [startDate, endOfDayDate],
+        },
+      };
     }
 
     try {
@@ -53,7 +105,7 @@ export class NewsService {
         });
 
       if (findedNews.length <= 0) {
-        throw new InternalServerErrorException('News could not be finded');
+        return [];
       }
 
       return { items: findedNews, count };
@@ -114,6 +166,25 @@ export class NewsService {
         throw new InternalServerErrorException(
           `News with ${id} could not be finded`,
         );
+      }
+
+      const images = Object.values(findedNews.content)
+        .map((content) => content.images)
+        .flat();
+
+      if (images.length) {
+        images.forEach((imagePath) => {
+          const fullPath = path.join(
+            __dirname,
+            '..',
+            '..',
+            'uploads',
+            path.basename(imagePath),
+          );
+          if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+          }
+        });
       }
 
       await findedNews.destroy();
