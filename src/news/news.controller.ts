@@ -16,6 +16,7 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { FindQueriesDto } from './dto/find-queries.dto';
 
 @Controller('news')
 export class NewsController {
@@ -73,8 +74,8 @@ export class NewsController {
   }
 
   @Get()
-  findAll(@Query('limit') limit: number, @Query('offset') offset: number) {
-    return this.newsService.findAll(limit, offset);
+  findAll(@Query() query: FindQueriesDto) {
+    return this.newsService.findAll(query);
   }
 
   @Get(':id')
