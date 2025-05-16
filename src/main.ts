@@ -20,9 +20,12 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: configService.get<string>('FRONTEND_URL'),
-    credentials: true,
-  });
+  origin: configService
+    .get<string>('FRONTEND_URL')
+    .split(',')
+    .map(url => url.trim()),
+  credentials: true,
+});
 
   // app.useGlobalFilters(new SentryExceptionFilter());
   app.setGlobalPrefix('api');
