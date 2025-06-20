@@ -23,6 +23,11 @@ export class Navigation extends Model {
   @Column
   order: number;
 
+  @Column({
+    defaultValue: true,
+  })
+  is_visible: boolean;
+
   @Column
   parent_id: number | null;
 

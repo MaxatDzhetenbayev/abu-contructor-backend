@@ -149,6 +149,7 @@ export class NavigationsService {
           title: findedPage.title[locale],
           navigation_type: findedPage.navigation_type,
           slug: slugs.slice(0, i + 1).join('/'),
+          is_visible: findedPage.is_visible,
         };
 
         if (findedPage) {
