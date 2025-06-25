@@ -3,14 +3,12 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
-import { UpdateNewsDto } from './dto/update-news.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { News } from './entities/news.entity';
 import sequelize, { FindOptions, Op } from 'sequelize';
-import * as path from 'path';
-import * as fs from 'fs';
 import { FindQueriesDto } from './dto/find-queries.dto';
 
 @Injectable()
@@ -141,21 +139,35 @@ export class NewsService {
     }
   }
 
-  async update(id: number, updateNewsDto: UpdateNewsDto) {
-    try {
-      const findedNews = await this.newsRepository.findByPk(id);
+  async update(
+    id: number,
+    updateDto: CreateNewsDto,
+    files: { [key: string]: Express.Multer.File[] },
+    imagesToKeep: { [lang: string]: string[] },
+  ) {
+    const news = await this.newsRepository.findByPk(id);
+    if (!news) throw new NotFoundException('Новость не найдена');
 
-      if (!findedNews) {
-        throw new InternalServerErrorException('News could not be updated');
-      }
+    for (const lang of ['kz', 'ru', 'en']) {
+      const keepImages = imagesToKeep?.[lang] || [];
 
-      await findedNews.update(updateNewsDto);
+      const newFiles = files?.[lang] || [];
+      const newImageNames = newFiles.map((f) => f.filename);
 
-      return findedNews;
-    } catch (error) {
-      this.logger.error(error);
-      throw new InternalServerErrorException('News could not be updated');
+      // Обновляем массив изображений
+      updateDto.content[lang].images = [...keepImages, ...newImageNames];
     }
+
+    // Обновление в базе
+    const updated = await this.newsRepository.update(updateDto, {
+      where: { id },
+      returning: true,
+    });
+
+    if (!updated)
+      throw new InternalServerErrorException('Could not update news');
+
+    return updated;
   }
 
   async remove(id: number) {
@@ -166,25 +178,6 @@ export class NewsService {
         throw new InternalServerErrorException(
           `News with ${id} could not be finded`,
         );
-      }
-
-      const images = Object.values(findedNews.content)
-        .map((content) => content.images)
-        .flat();
-
-      if (images.length) {
-        images.forEach((imagePath) => {
-          const fullPath = path.join(
-            __dirname,
-            '..',
-            '..',
-            'uploads',
-            path.basename(imagePath),
-          );
-          if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-          }
-        });
       }
 
       await findedNews.destroy();
