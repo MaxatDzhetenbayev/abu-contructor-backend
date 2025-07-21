@@ -148,7 +148,7 @@ export class NewsService {
     const news = await this.newsRepository.findByPk(id);
     if (!news) throw new NotFoundException('Новость не найдена');
 
-    for (const lang of ['kz', 'ru', 'en']) {
+    for (const lang of ['kz', 'ru']) {
       const keepImages = imagesToKeep?.[lang] || [];
 
       const newFiles = files?.[lang] || [];

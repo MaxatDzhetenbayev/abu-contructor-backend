@@ -80,7 +80,7 @@ export class NewsController {
 
   @Patch(':id')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'kz' }, { name: 'ru' }, { name: 'en' }], {
+    FileFieldsInterceptor([{ name: 'kz' }, { name: 'ru' }], {
       storage: diskStorage({
         destination: join(__dirname, '..', '..', 'uploads'),
         filename: (req, file, callback) => {
@@ -108,7 +108,6 @@ export class NewsController {
     files: {
       kz?: Express.Multer.File[];
       ru?: Express.Multer.File[];
-      en?: Express.Multer.File[];
     },
     @Body('data') updateNewsRaw: string,
     @Body('imagesToKeep') imagesToKeepRaw: string,
