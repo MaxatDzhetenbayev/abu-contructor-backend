@@ -33,7 +33,10 @@ export class NewsService {
         );
       }
 
-      const createdNews = await this.newsRepository.create(createNewsDto);
+      const createdNews = await this.newsRepository.create({
+        ...createNewsDto,
+        createdAt: createNewsDto.createdAt || new Date().toISOString(),
+      });
 
       if (!createdNews)
         throw new InternalServerErrorException('News could not be created');
