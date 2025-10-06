@@ -61,8 +61,7 @@ export class NewsService {
       config.where = {
         ...config.where,
         [Op.and]: [
-          sequelize.literal(`title->>'${lang}' IS NOT NULL`),
-          sequelize.literal(`content->>'${lang}' IS NOT NULL`),
+          sequelize.literal(`NULLIF(BTRIM(title->>'${lang}'), '') IS NOT NULL`),
         ],
       };
     }
