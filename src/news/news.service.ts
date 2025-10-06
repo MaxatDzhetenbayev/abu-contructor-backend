@@ -49,13 +49,24 @@ export class NewsService {
   }
 
   async findAll(queries: FindQueriesDto) {
-    const { offset, query, limit, startDate, endDate } = queries;
+    const { offset, query, limit, lang, startDate, endDate } = queries;
     const config: FindOptions<News> = {
       order: [['id', 'DESC']],
     };
 
     if (limit) config.limit = limit;
     if (offset) config.offset = offset;
+
+    if (lang) {
+      config.where = {
+        ...config.where,
+        [Op.and]: [
+          sequelize.literal(`title->>'${lang}' IS NOT NULL`),
+          sequelize.literal(`content->>'${lang}' IS NOT NULL`),
+        ],
+      };
+    }
+
     if (query)
       config.where = {
         ...config.where,
