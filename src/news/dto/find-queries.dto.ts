@@ -10,8 +10,9 @@ export class FindQueriesDto {
   @IsOptional()
   @IsString()
   limit: number;
+  @IsOptional()
   @IsEnum(Languages)
-  lang: Languages;
+  lang?: Languages;
   @IsOptional()
   @IsString()
   offset?: number;
