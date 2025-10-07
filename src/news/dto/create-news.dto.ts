@@ -1,4 +1,5 @@
-import { IsObject, IsISO8601, IsOptional } from 'class-validator';
+import { IsObject, IsISO8601, IsOptional, IsEnum } from 'class-validator';
+import { NewsSource } from '../entities/news.entity';
 
 export class CreateNewsDto {
   @IsObject()
@@ -14,6 +15,9 @@ export class CreateNewsDto {
   content: {
     [key: string]: any;
   };
+
+  @IsEnum(NewsSource)
+  source?: NewsSource;
 }
 
 export class CreateNewsData {
