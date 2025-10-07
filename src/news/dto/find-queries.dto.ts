@@ -23,7 +23,6 @@ export class FindQueriesDto {
   startDate?: string;
   @IsOptional()
   endDate?: string;
-  @IsOptional()
   @IsEnum(NewsSource)
   source?: NewsSource;
 }

@@ -66,16 +66,16 @@ export class NewsService {
       };
     }
 
-    if (source) {
+    if (source && source == NewsSource.ABU) {
       config.where = {
         ...config.where,
-        source,
+        source: NewsSource.ABU,
       };
-    } else {
+    } else if (source && source == NewsSource.AI) {
       config.where = {
         ...config.where,
         source: {
-          [Op.eq]: NewsSource.ABU,
+          [Op.not]: NewsSource.ABU,
         },
       };
     }
