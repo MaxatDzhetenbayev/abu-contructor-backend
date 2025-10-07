@@ -69,7 +69,9 @@ export class NewsService {
     if (source && source == NewsSource.ABU) {
       config.where = {
         ...config.where,
-        source: NewsSource.ABU,
+        source: {
+          [Op.not]: NewsSource.AI,
+        },
       };
     } else if (source && source == NewsSource.AI) {
       config.where = {
