@@ -7,6 +7,12 @@ import {
   BeforeUpdate,
 } from 'sequelize-typescript';
 
+export enum NewsSource {
+  AI = 'ai',
+  ABU = 'abu',
+  ALL = 'all',
+}
+
 @Table({ tableName: 'news', timestamps: true })
 export class News extends Model<News> {
   @Column({
@@ -22,6 +28,11 @@ export class News extends Model<News> {
   content: {
     [key: string]: any;
   };
+
+  @Column({
+    type: DataType.ENUM(...Object.values(NewsSource)),
+  })
+  source: NewsSource;
 
   @Column({ defaultValue: 0 })
   viewCount: number;

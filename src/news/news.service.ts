@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { News } from './entities/news.entity';
+import { News, NewsSource } from './entities/news.entity';
 import sequelize, { FindOptions, Op } from 'sequelize';
 import { FindQueriesDto } from './dto/find-queries.dto';
 
@@ -49,7 +49,7 @@ export class NewsService {
   }
 
   async findAll(queries: FindQueriesDto) {
-    const { offset, query, limit, lang, startDate, endDate } = queries;
+    const { offset, query, limit, lang, startDate, endDate, source } = queries;
     const config: FindOptions<News> = {
       order: [['id', 'DESC']],
     };
@@ -63,6 +63,20 @@ export class NewsService {
         [Op.and]: [
           sequelize.literal(`NULLIF(BTRIM(title->>'${lang}'), '') IS NOT NULL`),
         ],
+      };
+    }
+
+    if (source) {
+      config.where = {
+        ...config.where,
+        source,
+      };
+    } else {
+      config.where = {
+        ...config.where,
+        source: {
+          [Op.eq]: NewsSource.ABU,
+        },
       };
     }
 

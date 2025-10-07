@@ -1,4 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { NewsSource } from '../entities/news.entity';
 
 export enum Languages {
   RU = 'ru',
@@ -22,4 +23,7 @@ export class FindQueriesDto {
   startDate?: string;
   @IsOptional()
   endDate?: string;
+  @IsOptional()
+  @IsEnum(NewsSource)
+  source?: NewsSource;
 }
