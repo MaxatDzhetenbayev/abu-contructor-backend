@@ -48,16 +48,26 @@ export class News extends Model<News> {
   static async updateVectors(instance: News) {
     const sequelize = instance.sequelize;
 
+    // Безопасная генерация title_vector с проверкой на null/undefined
+    const titleRu = instance.title?.['ru'] || '';
+    const titleKz = instance.title?.['kz'] || '';
+    const titleEn = instance.title?.['en'] || '';
+
     instance.title_vector = sequelize.literal(`
-		to_tsvector('simple', '${instance.title['ru']}') ||
-		to_tsvector('simple', '${instance.title['kz']}') ||
-		to_tsvector('simple', '${instance.title['en']}')
-		`) as any;
+      to_tsvector('simple', ${sequelize.escape(titleRu)}) ||
+      to_tsvector('simple', ${sequelize.escape(titleKz)}) ||
+      to_tsvector('simple', ${sequelize.escape(titleEn)})
+    `) as any;
+
+    // Безопасная генерация description_vector с проверкой на null/undefined
+    const descRu = instance.content?.['ru']?.description || '';
+    const descKz = instance.content?.['kz']?.description || '';
+    const descEn = instance.content?.['en']?.description || '';
 
     instance.description_vector = sequelize.literal(`
-		to_tsvector('simple', '${instance.content['ru']?.description}') ||
-		to_tsvector('simple', '${instance.content['kz']?.description}') ||
-		to_tsvector('simple', '${instance.content['en']?.description}')
-		`) as any;
+      to_tsvector('simple', ${sequelize.escape(descRu)}) ||
+      to_tsvector('simple', ${sequelize.escape(descKz)}) ||
+      to_tsvector('simple', ${sequelize.escape(descEn)})
+    `) as any;
   }
 }

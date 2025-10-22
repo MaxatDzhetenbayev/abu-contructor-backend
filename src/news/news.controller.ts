@@ -16,6 +16,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { FindQueriesDto } from './dto/find-queries.dto';
+import { CreateNewsDto } from './dto/create-news.dto';
 
 @Controller('news')
 export class NewsController {
@@ -48,20 +49,52 @@ export class NewsController {
       },
     }),
   )
-  create(
+  async create(
     @UploadedFiles()
     files: {
-      kz: Express.Multer.File[];
-      ru: Express.Multer.File[];
-      en: Express.Multer.File[];
+      kz?: Express.Multer.File[];
+      ru?: Express.Multer.File[];
+      en?: Express.Multer.File[];
     },
     @Body('data') createNewsDto: any,
   ) {
     try {
-      const parsedDTO = JSON.parse(createNewsDto);
-      return this.newsService.create(parsedDTO, files);
+      if (!createNewsDto) {
+        throw new BadRequestException('Data field is required');
+      }
+
+      const parsedDTO: CreateNewsDto = JSON.parse(createNewsDto);
+
+      // Валидация обязательных полей
+      if (!parsedDTO.title || !parsedDTO.content) {
+        throw new BadRequestException('Title and content are required');
+      }
+
+      // Проверяем наличие title для всех языков
+      const requiredLanguages = ['ru', 'kz', 'en'];
+      for (const lang of requiredLanguages) {
+        if (!parsedDTO.title[lang]) {
+          throw new BadRequestException(
+            `Title for language '${lang}' is required`,
+          );
+        }
+        if (!parsedDTO.content[lang]) {
+          throw new BadRequestException(
+            `Content for language '${lang}' is required`,
+          );
+        }
+      }
+
+      console.log('Parsed DTO:', parsedDTO);
+      console.log('Files:', files);
+
+      return await this.newsService.create(parsedDTO, files);
     } catch (error) {
-      return error;
+      console.error('Error creating news:', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Invalid data format or server error');
     }
   }
 

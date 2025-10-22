@@ -27,10 +27,28 @@ export class NewsService {
     try {
       const normalFiles = { ...files };
 
+      // Обработка файлов для каждого языка
       for (const lang_files in normalFiles) {
-        createNewsDto.content[lang_files].images = normalFiles[lang_files].map(
-          (file) => file.filename,
-        );
+        if (normalFiles[lang_files] && normalFiles[lang_files].length > 0) {
+          // Инициализируем images массив если его нет
+          if (!createNewsDto.content[lang_files].images) {
+            createNewsDto.content[lang_files].images = [];
+          }
+
+          // Добавляем новые файлы
+          const newImages = normalFiles[lang_files].map(
+            (file) => file.filename,
+          );
+          createNewsDto.content[lang_files].images = [
+            ...createNewsDto.content[lang_files].images,
+            ...newImages,
+          ];
+        }
+      }
+
+      // Устанавливаем source по умолчанию если не указан
+      if (!createNewsDto.source) {
+        createNewsDto.source = NewsSource.ABU;
       }
 
       const createdNews = await this.newsRepository.create({
@@ -38,12 +56,28 @@ export class NewsService {
         createdAt: createNewsDto.createdAt || new Date().toISOString(),
       });
 
-      if (!createdNews)
+      if (!createdNews) {
         throw new InternalServerErrorException('News could not be created');
+      }
 
+      this.logger.log(`News created successfully with ID: ${createdNews.id}`);
       return createdNews;
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error('Error creating news:', error);
+
+      // Более детальная обработка ошибок
+      if (error.name === 'SequelizeValidationError') {
+        throw new InternalServerErrorException(
+          `Validation error: ${error.message}`,
+        );
+      } else if (error.name === 'SequelizeUniqueConstraintError') {
+        throw new InternalServerErrorException(
+          'News with this data already exists',
+        );
+      } else if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new InternalServerErrorException('Invalid reference data');
+      }
+
       throw new InternalServerErrorException('News could not be created');
     }
   }
