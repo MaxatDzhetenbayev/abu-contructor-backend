@@ -14,7 +14,7 @@ COPY . .
 
 RUN npm run build
 
-FROM registry.abu.edu.kz/ghcr-io/distroless/nodejs22-debian12:latest
+FROM registry.abu.edu.kz/gcr-io/distroless/nodejs22-debian12:latest
 WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
