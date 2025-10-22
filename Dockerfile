@@ -1,9 +1,9 @@
-FROM node:22 as dependencies
+FROM registry.abu.edu.kz/docker-hub/node:22 as dependencies
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-RUN npm ci
+RUN npm ci --registry https://npm.abu.edu.kz/repository/registry/
 
 FROM node:22 as builder
 WORKDIR /app
@@ -14,7 +14,7 @@ COPY . .
 
 RUN npm run build
 
-FROM gcr.io/distroless/nodejs22-debian12:latest
+FROM registry.abu.edu.kz/ghcr-io/distroless/nodejs22-debian12:latest
 WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
