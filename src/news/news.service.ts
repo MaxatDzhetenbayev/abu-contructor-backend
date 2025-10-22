@@ -85,7 +85,7 @@ export class NewsService {
   async findAll(queries: FindQueriesDto) {
     const { offset, query, limit, lang, startDate, endDate, source } = queries;
     const config: FindOptions<News> = {
-      order: [['id', 'DESC']],
+      order: [['createdAt', 'DESC']],
     };
 
     if (limit) config.limit = limit;
