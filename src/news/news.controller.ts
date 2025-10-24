@@ -1,22 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  UseInterceptors,
-  UploadedFiles,
   BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { NewsService } from './news.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { FindQueriesDto } from './dto/find-queries.dto';
 import { CreateNewsDto } from './dto/create-news.dto';
+import { FindQueriesDto } from './dto/find-queries.dto';
+import { NewsService } from './news.service';
 
 @Controller('news')
 export class NewsController {
@@ -64,29 +64,6 @@ export class NewsController {
       }
 
       const parsedDTO: CreateNewsDto = JSON.parse(createNewsDto);
-
-      // Валидация обязательных полей
-      if (!parsedDTO.title || !parsedDTO.content) {
-        throw new BadRequestException('Title and content are required');
-      }
-
-      // Проверяем наличие title для всех языков
-      const requiredLanguages = ['ru', 'kz', 'en'];
-      for (const lang of requiredLanguages) {
-        if (!parsedDTO.title[lang]) {
-          throw new BadRequestException(
-            `Title for language '${lang}' is required`,
-          );
-        }
-        if (!parsedDTO.content[lang]) {
-          throw new BadRequestException(
-            `Content for language '${lang}' is required`,
-          );
-        }
-      }
-
-      console.log('Parsed DTO:', parsedDTO);
-      console.log('Files:', files);
 
       return await this.newsService.create(parsedDTO, files);
     } catch (error) {
