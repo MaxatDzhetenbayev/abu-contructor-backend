@@ -21,5 +21,10 @@ export class AppealsController {
   findOne(@Param('id') id: string) {
     return this.appealsService.findOne(+id);
   }
+
+  @Post(':id/complete-check')
+  completeCheck(@Param('id') id: string) {
+    return this.appealsService.completeCheck(+id);
+  }
 }
 

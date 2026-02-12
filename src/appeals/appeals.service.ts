@@ -81,5 +81,24 @@ export class AppealsService {
     }
     return appeal;
   }
+
+  async completeCheck(id: number) {
+    try {
+      const appeal = await this.findOne(id);
+
+      if (!appeal.is_checked) {
+        appeal.is_checked = true;
+        appeal.checked_at = new Date();
+        await appeal.save();
+      }
+
+      return appeal;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        'Appeal check could not be completed',
+      );
+    }
+  }
 }
 
