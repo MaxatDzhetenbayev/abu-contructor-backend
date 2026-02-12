@@ -16,6 +16,7 @@ import { Content } from './contents/entities/content.entity';
 import { Template } from './template/entities/template.entity';
 import { Auth } from './auth/entities/auth.entity';
 import { CustomBlock } from './custom_blocks/entities/custom_block.entity';
+import { Appeal } from './appeals/entities/appeal.entity';
 
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
@@ -24,6 +25,7 @@ import { NewsModule } from './news/news.module';
 import { CustomBlocksModule } from './custom_blocks/custom_blocks.module';
 import { News } from './news/entities/news.entity';
 import { EventsModule } from './events/events.module';
+import { AppealsModule } from './appeals/appeals.module';
 
 import { SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
@@ -49,7 +51,16 @@ import { SentryGlobalFilter } from '@sentry/nestjs/setup';
       password: process.env.DB_PASS,
       database: process.env.DB,
       logging: false,
-      models: [Navigation, Widget, Content, Template, Auth, CustomBlock, News],
+      models: [
+        Navigation,
+        Widget,
+        Content,
+        Template,
+        Auth,
+        CustomBlock,
+        News,
+        Appeal,
+      ],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -65,6 +76,7 @@ import { SentryGlobalFilter } from '@sentry/nestjs/setup';
     NewsModule,
     CustomBlocksModule,
     EventsModule,
+    AppealsModule,
   ],
   exports: [SequelizeModule],
 })
