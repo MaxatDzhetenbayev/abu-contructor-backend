@@ -10,6 +10,7 @@ export enum AppealType {
   APPEAL = 'appeal',
   CLAIM = 'claim',
   CORRUPTION = 'corruption',
+  RECTOR = 'rector',
 }
 
 @Table({
