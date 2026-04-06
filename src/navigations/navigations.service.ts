@@ -53,16 +53,29 @@ export class NavigationsService {
   }
 
   async findAllRaw(){
-    return this.navigationRepository.findAll({
-      attributes: [
-        'title',
-        'slug',
-        'navigation_type',
-      ],
-      where: {
-        navigation_type: { [sequelize.Op.notIn]: ['group'] },
-      },
-    });
+
+    try {
+      const navigations = await this.navigationRepository.findAll({
+        attributes: [
+          'title',
+          'slug',
+          'navigation_type',
+          'updatedAt',
+        ],
+        where: {
+          navigation_type: { [sequelize.Op.notIn]: ['group'] },
+        },
+      });
+
+      if (!navigations){
+        return [];
+      }
+
+      return navigations;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Navigations could not be finded');
+    }
   }
 
   async findAll(withContent: boolean) {
