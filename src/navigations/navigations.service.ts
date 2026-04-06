@@ -52,6 +52,19 @@ export class NavigationsService {
     }
   }
 
+  async findAllRaw(){
+    return this.navigationRepository.findAll({
+      attributes: [
+        'title',
+        'slug',
+        'navigation_type',
+      ],
+      where: {
+        navigation_type: { [sequelize.Op.notIn]: ['group'] },
+      },
+    });
+  }
+
   async findAll(withContent: boolean) {
     const options = withContent && {
       include: [

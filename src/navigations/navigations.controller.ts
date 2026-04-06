@@ -37,6 +37,12 @@ export class NavigationsController {
     return this.navigationsService.findAll(!!withContent);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Get('raw')
+  findAllRaw() {
+    return this.navigationsService.findAllRaw();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.navigationsService.findOne(+id);
